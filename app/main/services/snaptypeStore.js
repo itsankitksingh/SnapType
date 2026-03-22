@@ -47,14 +47,57 @@ function makeId(prefix) {
   return `${prefix}_${randomUUID().replace(/-/g, '').slice(0, 10)}`;
 }
 
+function pad(value) {
+  return String(value).padStart(2, '0');
+}
+
+function toLocalDayKey(value = new Date()) {
+  const parsed = value instanceof Date ? value : new Date(value);
+  const safeDate = Number.isNaN(parsed.getTime()) ? new Date() : parsed;
+  return `${safeDate.getFullYear()}-${pad(safeDate.getMonth() + 1)}-${pad(safeDate.getDate())}`;
+}
+
+function sanitizeUsageHistory(history) {
+  const totalsByDay = new Map();
+
+  if (Array.isArray(history)) {
+    for (const entry of history) {
+      const dayKey = typeof entry?.date === 'string' ? entry.date.trim() : '';
+
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(dayKey)) {
+        continue;
+      }
+
+      const count = Number.isFinite(entry?.count) ? Math.max(0, Math.floor(entry.count)) : 0;
+
+      if (count <= 0) {
+        continue;
+      }
+
+      totalsByDay.set(dayKey, (totalsByDay.get(dayKey) || 0) + count);
+    }
+  }
+
+  return Array.from(totalsByDay.entries())
+    .sort((left, right) => left[0].localeCompare(right[0]))
+    .slice(-730)
+    .map(([date, count]) => ({
+      date,
+      count
+    }));
+}
+
 function sanitizeSnippetStats(stats) {
+  const history = sanitizeUsageHistory(stats?.history);
+  const usageTotalFromHistory = history.reduce((sum, entry) => sum + entry.count, 0);
   const usageCount = Number.isFinite(stats?.usageCount) ? Math.max(0, Math.floor(stats.usageCount)) : 0;
   const lastUsedAt =
     typeof stats?.lastUsedAt === 'string' && stats.lastUsedAt.trim() ? stats.lastUsedAt.trim() : '';
 
   return {
-    usageCount,
-    lastUsedAt
+    usageCount: Math.max(usageCount, usageTotalFromHistory),
+    lastUsedAt,
+    history
   };
 }
 
@@ -102,6 +145,10 @@ function sanitizeAllowedApp(appInfo) {
   };
 }
 
+function sanitizeTheme(theme) {
+  return theme === 'light' ? 'light' : DEFAULT_STATE.settings.theme;
+}
+
 function ensureState(rawState) {
   const triggerChar =
     typeof rawState?.settings?.triggerChar === 'string' && rawState.settings.triggerChar.trim()
@@ -125,10 +172,7 @@ function ensureState(rawState) {
     settings: {
       launchOnStartup: Boolean(rawState?.settings?.launchOnStartup),
       triggerChar,
-      theme:
-        rawState?.settings?.theme === 'forest' || rawState?.settings?.theme === 'sunrise'
-          ? rawState.settings.theme
-          : DEFAULT_STATE.settings.theme,
+      theme: sanitizeTheme(rawState?.settings?.theme),
       activeIn: {
         mode: rawState?.settings?.activeIn?.mode === 'allowlist' ? 'allowlist' : 'global',
         apps
@@ -177,10 +221,7 @@ function mergeSettings(current, patch) {
     launchOnStartup:
       typeof patch?.launchOnStartup === 'boolean' ? patch.launchOnStartup : current.launchOnStartup,
     triggerChar: nextTriggerChar,
-    theme:
-      patch?.theme === 'forest' || patch?.theme === 'sunrise' || patch?.theme === 'midnight'
-        ? patch.theme
-        : current.theme,
+    theme: typeof patch?.theme === 'string' ? sanitizeTheme(patch.theme) : current.theme,
     activeIn: {
       mode: patch?.activeIn?.mode === 'allowlist' ? 'allowlist' : patch?.activeIn?.mode === 'global' ? 'global' : current.activeIn.mode,
       apps: nextApps
@@ -320,7 +361,8 @@ class SnapTypeStore extends EventEmitter {
       },
       stats: {
         usageCount: 0,
-        lastUsedAt: ''
+        lastUsedAt: '',
+        history: []
       }
     };
 
@@ -365,7 +407,10 @@ class SnapTypeStore extends EventEmitter {
         lastUsedAt:
           typeof patch.stats.lastUsedAt === 'string'
             ? patch.stats.lastUsedAt.trim()
-            : currentStats.lastUsedAt
+            : currentStats.lastUsedAt,
+        history: Array.isArray(patch.stats.history)
+          ? sanitizeUsageHistory(patch.stats.history)
+          : currentStats.history
       };
     }
 
@@ -392,9 +437,26 @@ class SnapTypeStore extends EventEmitter {
     }
 
     const currentStats = sanitizeSnippetStats(location.snippet.stats);
+    const dayKey = toLocalDayKey(usedAt);
+    const nextHistory = currentStats.history.slice();
+    const entryIndex = nextHistory.findIndex((entry) => entry.date === dayKey);
+
+    if (entryIndex >= 0) {
+      nextHistory[entryIndex] = {
+        date: dayKey,
+        count: nextHistory[entryIndex].count + 1
+      };
+    } else {
+      nextHistory.push({
+        date: dayKey,
+        count: 1
+      });
+    }
+
     location.snippet.stats = {
       usageCount: currentStats.usageCount + 1,
-      lastUsedAt: usedAt
+      lastUsedAt: usedAt,
+      history: sanitizeUsageHistory(nextHistory)
     };
 
     return this.commit();
