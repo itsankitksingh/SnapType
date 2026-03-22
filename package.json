@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "description": "A lightweight Windows text expander built with Electron and vanilla web tech.",
   "main": "app/main/index.js",
-  "author": "OpenAI Codex",
+  "author": "Ankit Kumar Singh",
   "license": "MIT",
   "scripts": {
     "start": "electron .",

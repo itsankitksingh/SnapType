@@ -25,8 +25,8 @@ class WindowManager {
     this.mainWindow = new BrowserWindow({
       width: 1160,
       height: 760,
-      minWidth: 920,
-      minHeight: 620,
+      minWidth: 760,
+      minHeight: 560,
       show: false,
       frame: false,
       icon: this.iconPath,
@@ -141,7 +141,8 @@ class WindowManager {
   }
 
   hidePopup() {
-    if (this.popupWindow) {
+    if (this.popupWindow && !this.popupWindow.isDestroyed()) {
+      this.popupWindow.blur();
       this.popupWindow.hide();
     }
   }

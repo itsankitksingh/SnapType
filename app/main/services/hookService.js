@@ -73,6 +73,27 @@ const NAVIGATION_KEYS = new Set([
   UiohookKey.PageDown
 ]);
 
+const TOKEN_BOUNDARY_CHARACTERS = new Set([
+  ' ',
+  '\t',
+  '\n',
+  '.',
+  ',',
+  ';',
+  ':',
+  '!',
+  '?',
+  ')',
+  ']',
+  '}',
+  '"',
+  "'"
+]);
+
+function isBoundaryCharacter(character) {
+  return TOKEN_BOUNDARY_CHARACTERS.has(character);
+}
+
 function resolveCharacter(event) {
   const pair = LETTERS[event.keycode] || NUMBERS[event.keycode] || PUNCTUATION[event.keycode];
 
@@ -178,16 +199,33 @@ class GlobalShortcutHook extends EventEmitter {
       this.buffer.shift();
     }
 
+    if (!isBoundaryCharacter(character)) {
+      return;
+    }
+
+    const boundaryIndex = this.buffer.length - 1;
+
     for (const shortcutLength of this.shortcutLengths) {
-      if (shortcutLength > this.buffer.length) {
+      if (shortcutLength > boundaryIndex) {
         continue;
       }
 
-      const candidate = this.buffer.slice(this.buffer.length - shortcutLength).join('');
+      const candidateStart = boundaryIndex - shortcutLength;
+      const beforeShortcut = candidateStart > 0 ? this.buffer[candidateStart - 1] : null;
+
+      if (beforeShortcut !== null && !isBoundaryCharacter(beforeShortcut)) {
+        continue;
+      }
+
+      const candidate = this.buffer.slice(candidateStart, boundaryIndex).join('');
       const snippet = this.shortcutMap[candidate];
 
       if (snippet) {
-        this.emit('shortcut', snippet);
+        this.emit('shortcut', {
+          snippet,
+          trailingCharacter: character,
+          eraseLength: shortcutLength + 1
+        });
         return;
       }
     }

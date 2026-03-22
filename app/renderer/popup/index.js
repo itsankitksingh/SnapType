@@ -1,5 +1,6 @@
 const form = document.querySelector('#popupForm');
 const title = document.querySelector('#popupTitle');
+const meta = document.querySelector('#popupMeta');
 const cancelButton = document.querySelector('#cancelButton');
 const closeButton = document.querySelector('#closeButton');
 
@@ -9,9 +10,21 @@ function capitalize(value) {
   return value ? `${value.charAt(0).toUpperCase()}${value.slice(1)}` : value;
 }
 
+function fieldIdFor(placeholder, index) {
+  const safePlaceholder = String(placeholder || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+
+  return `field-${safePlaceholder || 'placeholder'}-${index}`;
+}
+
 function render(payload) {
   currentPayload = payload;
   title.textContent = payload.placeholders.length > 0 ? 'Fill placeholders' : 'Ready to insert';
+  meta.textContent = payload.placeholders.length > 0
+    ? `Add values for ${payload.shortcut || 'this snippet'} before SnapType types it into your active app.`
+    : 'No placeholders were found for this snippet.';
 
   if (!payload.placeholders.length) {
     form.innerHTML = '<p class="empty-copy">No placeholders were found for this snippet.</p>';
@@ -20,10 +33,10 @@ function render(payload) {
 
   form.innerHTML = payload.placeholders
     .map(
-      (placeholder) => `
+      (placeholder, index) => `
         <div class="popup-field">
-          <label for="field-${placeholder}">${capitalize(placeholder)}</label>
-          <input id="field-${placeholder}" name="${placeholder}" type="text" autocomplete="off" />
+          <label for="${fieldIdFor(placeholder, index)}">${capitalize(placeholder)}</label>
+          <input id="${fieldIdFor(placeholder, index)}" name="${placeholder}" type="text" autocomplete="off" />
         </div>
       `
     )
@@ -32,7 +45,10 @@ function render(payload) {
   const firstInput = form.querySelector('input');
 
   if (firstInput) {
-    firstInput.focus();
+    window.requestAnimationFrame(() => {
+      firstInput.focus();
+      firstInput.select();
+    });
   }
 }
 

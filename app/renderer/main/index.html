@@ -13,10 +13,14 @@
         --accent-soft: #8b8cc8;
         --accent-muted: #9496d1;
         --accent-light: #b0b2e8;
+        --body-bg: #141414;
         --shell: #202020;
+        --titlebar: #2c2c2c;
         --nav: #2c2c2c;
         --content: #1c1c1c;
         --card: #262626;
+        --chart-a: rgba(98, 100, 167, 0.88);
+        --chart-b: rgba(139, 140, 200, 0.62);
         --text-main: rgba(255, 255, 255, 0.92);
         --text-secondary: rgba(255, 255, 255, 0.75);
         --text-muted: rgba(255, 255, 255, 0.35);
@@ -29,6 +33,36 @@
         --warning-bg: rgba(255, 185, 0, 0.12);
       }
 
+      body[data-theme="forest"] {
+        --accent: #2f7d68;
+        --accent-soft: #63a994;
+        --accent-muted: #7ec0ad;
+        --accent-light: #b7e0d4;
+        --body-bg: #101614;
+        --shell: #1b2320;
+        --titlebar: #25302b;
+        --nav: #24302c;
+        --content: #161f1c;
+        --card: #212e29;
+        --chart-a: rgba(47, 125, 104, 0.88);
+        --chart-b: rgba(99, 169, 148, 0.66);
+      }
+
+      body[data-theme="sunrise"] {
+        --accent: #b7642f;
+        --accent-soft: #dd9054;
+        --accent-muted: #ebb07f;
+        --accent-light: #f6ceb0;
+        --body-bg: #16100d;
+        --shell: #241a16;
+        --titlebar: #332521;
+        --nav: #31231d;
+        --content: #1d1410;
+        --card: #2d211c;
+        --chart-a: rgba(183, 100, 47, 0.88);
+        --chart-b: rgba(221, 144, 84, 0.66);
+      }
+
       * {
         box-sizing: border-box;
       }
@@ -37,14 +71,14 @@
       body {
         margin: 0;
         min-height: 100%;
-        background: #141414;
+        background: var(--body-bg);
         font-family: "Segoe UI", system-ui, sans-serif;
         color: var(--text-main);
       }
 
       body {
         padding: 8px;
-        overflow: hidden;
+        overflow: auto;
       }
 
       button,
@@ -65,7 +99,8 @@
       .window-shell {
         display: flex;
         flex-direction: column;
-        min-height: calc(100vh - 16px);
+        height: calc(100vh - 16px);
+        min-height: 0;
         background: var(--shell);
         border: 1px solid rgba(255, 255, 255, 0.12);
         border-radius: 8px;
@@ -77,7 +112,7 @@
         align-items: center;
         justify-content: space-between;
         height: 32px;
-        background: #2c2c2c;
+        background: var(--titlebar);
         border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         -webkit-app-region: drag;
         user-select: none;
@@ -144,13 +179,14 @@
       }
 
       .nav-pane {
-        display: flex;
-        flex-direction: column;
+        display: grid;
+        grid-template-rows: auto auto minmax(0, 1fr) auto;
         width: 220px;
         flex: 0 0 220px;
         min-height: 0;
-        background: #2c2c2c;
+        background: var(--nav);
         border-right: 1px solid rgba(255, 255, 255, 0.06);
+        overflow: hidden;
       }
 
       .brand-header {
@@ -317,6 +353,16 @@
         background: rgba(255, 255, 255, 0.04);
       }
 
+      .folder-row.active {
+        background: rgba(98, 100, 167, 0.16);
+        color: rgba(255, 255, 255, 0.92);
+      }
+
+      .folder-row.active .folder-name,
+      .folder-row.active .folder-chevron {
+        color: #b0b2e8;
+      }
+
       .folder-row-main {
         display: flex;
         align-items: center;
@@ -412,10 +458,13 @@
       }
 
       .pane-footer {
-        margin-top: auto;
         display: grid;
         gap: 5px;
         padding: 10px;
+        position: sticky;
+        bottom: 0;
+        z-index: 1;
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0), var(--nav) 22%);
         border-top: 1px solid rgba(255, 255, 255, 0.07);
       }
 
@@ -447,11 +496,43 @@
 
       .content-area {
         flex: 1;
+        display: flex;
+        flex-direction: column;
         min-width: 0;
         min-height: 0;
         overflow: auto;
-        background: #1c1c1c;
+        background: var(--content);
         padding: 24px 28px;
+      }
+
+      .content-tabs {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+      }
+
+      .tab-button {
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.04);
+        color: rgba(255, 255, 255, 0.68);
+        padding: 7px 14px;
+        font-size: 12px;
+      }
+
+      .tab-button.active {
+        border-color: rgba(98, 100, 167, 0.35);
+        background: rgba(98, 100, 167, 0.18);
+        color: var(--accent-light);
+      }
+
+      .view-panel.hidden {
+        display: none;
+      }
+
+      .view-panel {
+        min-height: 0;
       }
 
       .content-header {
@@ -496,6 +577,19 @@
         font-size: 12px;
       }
 
+      .command-button:disabled,
+      .danger-button:disabled,
+      .tiny-action:disabled,
+      .accent-button:disabled,
+      .subtle-button:disabled,
+      .scope-button:disabled,
+      .settings-action:disabled,
+      .tiny-button:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+        transform: none;
+      }
+
       .field-grid {
         display: grid;
         grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -506,8 +600,9 @@
       .field-card,
       .body-card,
       .preview-card,
+      .dashboard-card,
       .settings-dialog {
-        background: #262626;
+        background: var(--card);
         border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 6px;
       }
@@ -518,6 +613,206 @@
 
       .field-card .field-label {
         margin-bottom: 10px;
+      }
+
+      .full-span {
+        grid-column: 1 / -1;
+      }
+
+      .scope-toggle {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+
+      .scope-button {
+        padding: 6px 12px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.04);
+        color: rgba(255, 255, 255, 0.68);
+        font-size: 12px;
+      }
+
+      .scope-button.active {
+        border-color: rgba(98, 100, 167, 0.35);
+        background: rgba(98, 100, 167, 0.18);
+        color: #b0b2e8;
+      }
+
+      .inline-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .dashboard-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.8fr);
+        gap: 14px;
+      }
+
+      .dashboard-stack {
+        display: grid;
+        gap: 14px;
+      }
+
+      .dashboard-card {
+        padding: 16px;
+      }
+
+      .dashboard-card h3 {
+        margin: 0 0 4px;
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.88);
+      }
+
+      .dashboard-card p {
+        margin: 0 0 14px;
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.34);
+      }
+
+      .metric-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+
+      .metric-card {
+        padding: 14px;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+      }
+
+      .metric-card span,
+      .metric-card strong {
+        display: block;
+      }
+
+      .metric-card span {
+        margin-bottom: 6px;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: rgba(255, 255, 255, 0.3);
+      }
+
+      .metric-card strong {
+        font-size: 20px;
+        color: rgba(255, 255, 255, 0.92);
+      }
+
+      .bar-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .bar-row {
+        display: grid;
+        gap: 6px;
+      }
+
+      .bar-meta {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.72);
+      }
+
+      .bar-track {
+        height: 10px;
+        border-radius: 999px;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .bar-fill {
+        height: 100%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, var(--chart-a), var(--chart-b));
+      }
+
+      .activity-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .activity-item {
+        display: grid;
+        gap: 4px;
+        padding: 10px 12px;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .activity-item strong {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.86);
+      }
+
+      .activity-item span {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.4);
+      }
+
+      .theme-picker {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+
+      .theme-chip {
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.04);
+        color: rgba(255, 255, 255, 0.74);
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+
+      .theme-chip.active {
+        border-color: rgba(98, 100, 167, 0.35);
+        background: rgba(98, 100, 167, 0.18);
+        color: var(--accent-light);
+      }
+
+      .stat-item {
+        padding: 10px 12px;
+        border-radius: 4px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        background: rgba(255, 255, 255, 0.03);
+      }
+
+      .stat-item span,
+      .stat-item strong {
+        display: block;
+      }
+
+      .stat-item span {
+        margin-bottom: 4px;
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.32);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+
+      .stat-item strong {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.84);
       }
 
       .fluent-input,
@@ -541,6 +836,25 @@
       .settings-input:focus {
         border-color: #6264a7;
         box-shadow: inset 0 -2px 0 0 #8b8cc8;
+      }
+
+      .shortcut-status {
+        margin-top: 9px;
+        font-size: 11px;
+        line-height: 1.45;
+        color: rgba(255, 255, 255, 0.28);
+      }
+
+      .shortcut-status.ok {
+        color: rgba(108, 203, 95, 0.88);
+      }
+
+      .shortcut-status.warn {
+        color: #ffc240;
+      }
+
+      .shortcut-status.error {
+        color: #f08070;
       }
 
       .placeholder-badge {
@@ -708,7 +1022,19 @@
         z-index: 40;
       }
 
+      .dialog-overlay {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.44);
+        backdrop-filter: blur(8px);
+        z-index: 45;
+      }
+
       .settings-overlay.hidden,
+      .dialog-overlay.hidden,
       .toast.hidden {
         display: none;
       }
@@ -717,6 +1043,53 @@
         width: min(680px, calc(100vw - 40px));
         max-height: calc(100vh - 60px);
         overflow: auto;
+      }
+
+      .input-dialog {
+        width: min(420px, calc(100vw - 40px));
+        padding: 18px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: #262626;
+        box-shadow: 0 22px 48px rgba(0, 0, 0, 0.38);
+      }
+
+      .input-dialog h3 {
+        margin: 0 0 6px;
+        font-size: 16px;
+        color: rgba(255, 255, 255, 0.92);
+      }
+
+      .input-dialog p {
+        margin: 0 0 14px;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.42);
+      }
+
+      .dialog-form {
+        display: grid;
+        gap: 12px;
+      }
+
+      .dialog-input {
+        width: 100%;
+        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.88);
+        padding: 10px 12px;
+        outline: 0;
+      }
+
+      .dialog-input:focus {
+        border-color: #6264a7;
+        box-shadow: inset 0 -2px 0 0 #8b8cc8;
+      }
+
+      .dialog-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
       }
 
       .settings-body {
@@ -849,7 +1222,7 @@
       .settings-action {
         background: rgba(98, 100, 167, 0.15);
         border-color: rgba(98, 100, 167, 0.3);
-        color: #8b8cc8;
+        color: var(--accent-soft);
       }
 
       .tiny-button {
@@ -929,6 +1302,40 @@
         z-index: 50;
       }
 
+      .context-menu {
+        position: fixed;
+        min-width: 180px;
+        padding: 6px;
+        border-radius: 8px;
+        background: rgba(28, 28, 28, 0.98);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.34);
+        z-index: 55;
+      }
+
+      .context-menu.hidden {
+        display: none;
+      }
+
+      .context-menu button {
+        width: 100%;
+        border: 0;
+        border-radius: 6px;
+        background: transparent;
+        color: rgba(255, 255, 255, 0.82);
+        text-align: left;
+        padding: 9px 10px;
+        font-size: 12px;
+      }
+
+      .context-menu button:hover {
+        background: rgba(255, 255, 255, 0.06);
+      }
+
+      .context-menu button.danger {
+        color: #f08070;
+      }
+
       ::-webkit-scrollbar {
         width: 6px;
         height: 6px;
@@ -944,8 +1351,84 @@
       }
 
       @media (max-width: 1080px) {
+        .metric-grid,
+        .dashboard-grid {
+          grid-template-columns: 1fr;
+        }
+
         .field-grid {
           grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 920px) {
+        .layout {
+          flex-direction: column;
+        }
+
+        .nav-pane {
+          width: 100%;
+          flex: 0 0 auto;
+          border-right: 0;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+          grid-template-rows: auto auto minmax(150px, 28vh) auto;
+        }
+
+        .content-header,
+        .settings-row,
+        .settings-footer {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .theme-picker {
+          width: 100%;
+          justify-content: flex-start;
+        }
+
+        .pane-footer {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .content-area {
+          padding: 16px;
+        }
+
+        .pane-footer {
+          grid-template-columns: 1fr;
+        }
+
+        .command-bar {
+          width: 100%;
+        }
+
+        .command-bar > button {
+          width: 100%;
+        }
+
+        .body-card-header,
+        .preview-header {
+          align-items: flex-start;
+        }
+
+        .body-toolbar {
+          flex-wrap: wrap;
+        }
+      }
+
+      @media (max-height: 760px) {
+        .content-area {
+          padding: 18px 20px;
+        }
+
+        .brand-header {
+          padding: 12px 14px 10px;
+        }
+
+        .search-block {
+          padding: 8px 10px;
         }
       }
     </style>
@@ -1007,50 +1490,140 @@
             </div>
             <div class="command-bar">
               <button id="folderPill" class="command-button" type="button">General</button>
+              <button id="renameFolderButton" class="command-button" type="button">Rename Folder</button>
+              <button id="moveFolderUpButton" class="command-button" type="button">Move Up</button>
+              <button id="moveFolderDownButton" class="command-button" type="button">Move Down</button>
+              <button id="deleteFolderButton" class="danger-button" type="button">Delete Folder</button>
               <button id="deleteSnippetButton" class="danger-button" type="button">🗑 Delete Snippet</button>
             </div>
           </div>
 
-          <section class="field-grid">
-            <article class="field-card">
-              <div class="field-label">Shortcut</div>
-              <input id="shortcutInput" class="fluent-input" type="text" spellcheck="false" autocomplete="off" />
-            </article>
+          <div class="content-tabs">
+            <button id="editorTabButton" class="tab-button active" type="button">Editor</button>
+            <button id="dashboardTabButton" class="tab-button" type="button">Dashboard</button>
+          </div>
 
-            <article class="field-card">
-              <div class="field-label">Placeholder Scan</div>
-              <div id="placeholderBadge" class="placeholder-badge empty">
-                <span class="badge-dot"></span>
-                <span id="placeholderText">0 placeholders detected</span>
+          <section id="editorView" class="view-panel">
+            <section class="field-grid">
+              <article class="field-card">
+                <div class="field-label">Shortcut</div>
+                <input id="shortcutInput" class="fluent-input" type="text" spellcheck="false" autocomplete="off" />
+                <div id="shortcutStatus" class="shortcut-status">Enter a shortcut to trigger this snippet.</div>
+              </article>
+
+              <article class="field-card">
+                <div class="field-label">Placeholder Scan</div>
+                <div id="placeholderBadge" class="placeholder-badge empty">
+                  <span class="badge-dot"></span>
+                  <span id="placeholderText">0 placeholders detected</span>
+                </div>
+                <p class="hint-text">Patterns like <span class="inline-code">{{name}}</span> open a popup before insertion. <span class="inline-code">{{date:MMM d, yyyy}}</span> and <span class="inline-code">{{time:hh:mm A}}</span> fill automatically.</p>
+              </article>
+            </section>
+
+            <section class="field-grid">
+              <article class="field-card full-span">
+                <div class="field-label">Snippet Scope</div>
+                <div class="scope-toggle">
+                  <button id="snippetScopeAllButton" class="scope-button active" type="button">All Apps</button>
+                  <button id="snippetScopeSpecificButton" class="scope-button" type="button">Only Selected Apps</button>
+                </div>
+                <p class="hint-text">Use snippet targeting when a shortcut should only expand in Chrome, Word, or another specific app.</p>
+                <div id="snippetAppsTools" class="inline-actions">
+                  <button id="addSnippetAppButton" class="tiny-action" type="button">Add App</button>
+                  <button id="pickSnippetAppButton" class="tiny-action" type="button">Pick Active Window</button>
+                </div>
+                <div id="snippetApps" class="allowed-apps"></div>
+              </article>
+            </section>
+
+            <section class="body-card">
+              <div class="body-card-header">
+                <div class="field-label">Snippet Body</div>
+                <div class="body-toolbar">
+                  <button id="insertPlaceholderButton" class="chip-button" type="button">{{ph}}</button>
+                  <button id="insertDateButton" class="chip-button" type="button">{{date}}</button>
+                  <button id="insertTimeButton" class="chip-button" type="button">{{time}}</button>
+                  <button id="insertNewlineButton" class="chip-button" type="button">↵</button>
+                  <button id="insertTabButton" class="chip-button" type="button">↹</button>
+                </div>
               </div>
-              <p class="hint-text">Patterns like <span class="inline-code">{{name}}</span> open a popup before insertion.</p>
-            </article>
+              <textarea id="bodyInput" class="body-textarea" spellcheck="false" placeholder="Type your snippet text here…"></textarea>
+              <div class="body-card-footer">
+                <div class="body-footnote">SnapType erases the shortcut, then types this text into the active window.</div>
+                <div id="charCount" class="char-count mono">0 chars</div>
+              </div>
+            </section>
+
+            <section class="preview-card">
+              <div class="preview-header">
+                <div class="live-head">
+                  <span class="live-dot"></span>
+                  <span class="field-label">Live Preview</span>
+                </div>
+              </div>
+              <div id="livePreview" class="preview-body">Your snippet preview will appear here.</div>
+            </section>
           </section>
 
-          <section class="body-card">
-            <div class="body-card-header">
-              <div class="field-label">Snippet Body</div>
-              <div class="body-toolbar">
-                <button id="insertPlaceholderButton" class="chip-button" type="button">{{ph}}</button>
-                <button id="insertNewlineButton" class="chip-button" type="button">↵</button>
-                <button id="insertTabButton" class="chip-button" type="button">↹</button>
-              </div>
-            </div>
-            <textarea id="bodyInput" class="body-textarea" spellcheck="false" placeholder="Type your snippet text here…"></textarea>
-            <div class="body-card-footer">
-              <div class="body-footnote">SnapType erases the shortcut, then types this text into the active window.</div>
-              <div id="charCount" class="char-count mono">0 chars</div>
-            </div>
-          </section>
+          <section id="dashboardView" class="view-panel hidden">
+            <section class="metric-grid">
+              <article class="metric-card">
+                <span>Total Snippets</span>
+                <strong id="dashboardTotalSnippets">0</strong>
+              </article>
+              <article class="metric-card">
+                <span>Total Folders</span>
+                <strong id="dashboardTotalFolders">0</strong>
+              </article>
+              <article class="metric-card">
+                <span>Total Expansions</span>
+                <strong id="dashboardTotalUsage">0</strong>
+              </article>
+              <article class="metric-card">
+                <span>Selected Snippet</span>
+                <strong id="dashboardCurrentSnippetUsage">0</strong>
+              </article>
+            </section>
 
-          <section class="preview-card">
-            <div class="preview-header">
-              <div class="live-head">
-                <span class="live-dot"></span>
-                <span class="field-label">Live Preview</span>
+            <section class="dashboard-grid">
+              <div class="dashboard-stack">
+                <article class="dashboard-card">
+                  <h3>Top Snippets</h3>
+                  <p>See which shortcuts get used the most.</p>
+                  <div id="topSnippetsChart" class="bar-list"></div>
+                </article>
+
+                <article class="dashboard-card">
+                  <h3>Folder Usage</h3>
+                  <p>Folder totals help you spot where your templates are doing the most work.</p>
+                  <div id="folderUsageChart" class="bar-list"></div>
+                </article>
               </div>
-            </div>
-            <div id="livePreview" class="preview-body">Your snippet preview will appear here.</div>
+
+              <div class="dashboard-stack">
+                <article class="dashboard-card">
+                  <h3>Selected Snippet</h3>
+                  <p id="dashboardSelectedSnippetLabel">Usage for the active shortcut.</p>
+                  <div class="stats-grid">
+                    <div class="stat-item">
+                      <span>Used</span>
+                      <strong id="usageCount">0 times</strong>
+                    </div>
+                    <div class="stat-item">
+                      <span>Last Used</span>
+                      <strong id="lastUsedAt">Never</strong>
+                    </div>
+                  </div>
+                </article>
+
+                <article class="dashboard-card">
+                  <h3>Recent Activity</h3>
+                  <p>Most recently expanded snippets across your library.</p>
+                  <div id="recentActivityList" class="activity-list"></div>
+                </article>
+              </div>
+            </section>
           </section>
         </main>
       </div>
@@ -1085,6 +1658,17 @@
               </div>
               <input id="triggerInput" class="settings-input mono" type="text" maxlength="1" />
             </div>
+            <div class="settings-row">
+              <div class="settings-copy">
+                <strong>Color theme</strong>
+                <span>Pick the shell color system you want across the app.</span>
+              </div>
+              <div id="themePicker" class="theme-picker">
+                <button class="theme-chip" data-theme-choice="midnight" type="button">Midnight</button>
+                <button class="theme-chip" data-theme-choice="forest" type="button">Forest</button>
+                <button class="theme-chip" data-theme-choice="sunrise" type="button">Sunrise</button>
+              </div>
+            </div>
           </section>
 
           <section class="settings-section">
@@ -1115,7 +1699,34 @@
       </div>
     </div>
 
+    <div id="folderDialogOverlay" class="dialog-overlay hidden">
+      <div class="input-dialog">
+        <h3 id="folderDialogTitle">New Folder</h3>
+        <p id="folderDialogCopy">Choose a clear folder name for your snippets.</p>
+        <form id="folderDialogForm" class="dialog-form">
+          <input
+            id="folderDialogInput"
+            class="dialog-input"
+            type="text"
+            maxlength="80"
+            autocomplete="off"
+            spellcheck="false"
+            placeholder="Folder name"
+          />
+          <div class="dialog-actions">
+            <button id="folderDialogCancel" class="tiny-button" type="button">Cancel</button>
+            <button id="folderDialogSubmit" class="accent-button" type="submit">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <div id="toast" class="toast hidden" aria-live="polite"></div>
+
+    <div id="snippetContextMenu" class="context-menu hidden">
+      <button id="renameSnippetMenuAction" type="button">Rename Shortcut</button>
+      <button id="deleteSnippetMenuAction" class="danger" type="button">Delete Snippet</button>
+    </div>
 
     <script>
       const fallbackPayload = {
@@ -1125,15 +1736,34 @@
               id: "folder_general",
               name: "General",
               snippets: [
-                { id: "snip_new", shortcut: "/new", body: "" },
-                { id: "snip_name", shortcut: "/nme", body: "Ankit Kumar Singh" },
-                { id: "snip_thanks", shortcut: "/ty", body: "thank you" }
+                {
+                  id: "snip_new",
+                  shortcut: "/new",
+                  body: "",
+                  activeIn: { mode: "all", apps: [] },
+                  stats: { usageCount: 0, lastUsedAt: "" }
+                },
+                {
+                  id: "snip_name",
+                  shortcut: "/nme",
+                  body: "Ankit Kumar Singh",
+                  activeIn: { mode: "all", apps: [] },
+                  stats: { usageCount: 0, lastUsedAt: "" }
+                },
+                {
+                  id: "snip_thanks",
+                  shortcut: "/ty",
+                  body: "thank you",
+                  activeIn: { mode: "all", apps: [] },
+                  stats: { usageCount: 0, lastUsedAt: "" }
+                }
               ]
             }
           ],
           settings: {
             launchOnStartup: false,
             triggerChar: "/",
+            theme: "midnight",
             activeIn: {
               mode: "global",
               apps: []
@@ -1154,11 +1784,31 @@
         selectedSnippetId: null,
         collapsedFolders: {},
         searchTerm: "",
+        activeTab: "editor",
         editorDraft: null,
         saveTimer: null,
         settingsTimer: null,
-        toastTimer: null
+        toastTimer: null,
+        folderDialogResolver: null,
+        snippetContextSnippetId: null
       };
+
+      const SYSTEM_PLACEHOLDER_KINDS = new Set(["date", "time", "datetime"]);
+      const MONTHS_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const MONTHS_LONG = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December"
+      ];
 
       const elements = {
         folderList: document.querySelector("#folderList"),
@@ -1166,22 +1816,48 @@
         newFolderButton: document.querySelector("#newFolderButton"),
         newSnippetButton: document.querySelector("#newSnippetButton"),
         settingsButton: document.querySelector("#settingsButton"),
+        editorTabButton: document.querySelector("#editorTabButton"),
+        dashboardTabButton: document.querySelector("#dashboardTabButton"),
+        editorView: document.querySelector("#editorView"),
+        dashboardView: document.querySelector("#dashboardView"),
         pageTitle: document.querySelector("#pageTitle"),
         folderPill: document.querySelector("#folderPill"),
+        renameFolderButton: document.querySelector("#renameFolderButton"),
+        moveFolderUpButton: document.querySelector("#moveFolderUpButton"),
+        moveFolderDownButton: document.querySelector("#moveFolderDownButton"),
+        deleteFolderButton: document.querySelector("#deleteFolderButton"),
         shortcutInput: document.querySelector("#shortcutInput"),
+        shortcutStatus: document.querySelector("#shortcutStatus"),
         bodyInput: document.querySelector("#bodyInput"),
         placeholderBadge: document.querySelector("#placeholderBadge"),
         placeholderText: document.querySelector("#placeholderText"),
         charCount: document.querySelector("#charCount"),
         livePreview: document.querySelector("#livePreview"),
+        snippetScopeAllButton: document.querySelector("#snippetScopeAllButton"),
+        snippetScopeSpecificButton: document.querySelector("#snippetScopeSpecificButton"),
+        snippetAppsTools: document.querySelector("#snippetAppsTools"),
+        addSnippetAppButton: document.querySelector("#addSnippetAppButton"),
+        pickSnippetAppButton: document.querySelector("#pickSnippetAppButton"),
+        snippetApps: document.querySelector("#snippetApps"),
+        usageCount: document.querySelector("#usageCount"),
+        lastUsedAt: document.querySelector("#lastUsedAt"),
         deleteSnippetButton: document.querySelector("#deleteSnippetButton"),
         insertPlaceholderButton: document.querySelector("#insertPlaceholderButton"),
+        insertDateButton: document.querySelector("#insertDateButton"),
+        insertTimeButton: document.querySelector("#insertTimeButton"),
         insertNewlineButton: document.querySelector("#insertNewlineButton"),
         insertTabButton: document.querySelector("#insertTabButton"),
         minimizeWindow: document.querySelector("#minimizeWindow"),
         toggleMaximizeWindow: document.querySelector("#toggleMaximizeWindow"),
         hideWindow: document.querySelector("#hideWindow"),
         settingsOverlay: document.querySelector("#settingsOverlay"),
+        folderDialogOverlay: document.querySelector("#folderDialogOverlay"),
+        folderDialogTitle: document.querySelector("#folderDialogTitle"),
+        folderDialogCopy: document.querySelector("#folderDialogCopy"),
+        folderDialogForm: document.querySelector("#folderDialogForm"),
+        folderDialogInput: document.querySelector("#folderDialogInput"),
+        folderDialogCancel: document.querySelector("#folderDialogCancel"),
+        folderDialogSubmit: document.querySelector("#folderDialogSubmit"),
         closeSettingsButton: document.querySelector("#closeSettingsButton"),
         doneSettingsButton: document.querySelector("#doneSettingsButton"),
         launchToggle: document.querySelector("#launchToggle"),
@@ -1192,7 +1868,20 @@
         addAppButton: document.querySelector("#addAppButton"),
         pickActiveButton: document.querySelector("#pickActiveButton"),
         allowedApps: document.querySelector("#allowedApps"),
-        toast: document.querySelector("#toast")
+        themePicker: document.querySelector("#themePicker"),
+        themeButtons: Array.from(document.querySelectorAll("[data-theme-choice]")),
+        dashboardTotalSnippets: document.querySelector("#dashboardTotalSnippets"),
+        dashboardTotalFolders: document.querySelector("#dashboardTotalFolders"),
+        dashboardTotalUsage: document.querySelector("#dashboardTotalUsage"),
+        dashboardCurrentSnippetUsage: document.querySelector("#dashboardCurrentSnippetUsage"),
+        dashboardSelectedSnippetLabel: document.querySelector("#dashboardSelectedSnippetLabel"),
+        topSnippetsChart: document.querySelector("#topSnippetsChart"),
+        folderUsageChart: document.querySelector("#folderUsageChart"),
+        recentActivityList: document.querySelector("#recentActivityList"),
+        toast: document.querySelector("#toast"),
+        snippetContextMenu: document.querySelector("#snippetContextMenu"),
+        renameSnippetMenuAction: document.querySelector("#renameSnippetMenuAction"),
+        deleteSnippetMenuAction: document.querySelector("#deleteSnippetMenuAction")
       };
 
       function clone(value) {
@@ -1218,6 +1907,101 @@
         return String(value || "").trim().toLowerCase();
       }
 
+      function getSnippetActiveIn(snippet) {
+        return {
+          mode: snippet?.activeIn?.mode === "specific" ? "specific" : "all",
+          apps: Array.isArray(snippet?.activeIn?.apps) ? snippet.activeIn.apps : []
+        };
+      }
+
+      function getSnippetStats(snippet) {
+        return {
+          usageCount: Number.isFinite(snippet?.stats?.usageCount) ? Math.max(0, Math.floor(snippet.stats.usageCount)) : 0,
+          lastUsedAt: typeof snippet?.stats?.lastUsedAt === "string" ? snippet.stats.lastUsedAt : ""
+        };
+      }
+
+      function formatLastUsedAt(value) {
+        if (!value) {
+          return "Never";
+        }
+
+        const parsed = new Date(value);
+
+        if (Number.isNaN(parsed.getTime())) {
+          return "Never";
+        }
+
+        return new Intl.DateTimeFormat("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+          hour: "numeric",
+          minute: "2-digit"
+        }).format(parsed);
+      }
+
+      function getTheme() {
+        return uiState.data?.settings?.theme || fallbackPayload.state.settings.theme || "midnight";
+      }
+
+      function applyTheme(theme) {
+        const nextTheme = theme === "forest" || theme === "sunrise" ? theme : "midnight";
+        document.body.dataset.theme = nextTheme;
+      }
+
+      function renderThemePicker() {
+        const activeTheme = getTheme();
+
+        elements.themeButtons.forEach((button) => {
+          button.classList.toggle("active", button.dataset.themeChoice === activeTheme);
+        });
+      }
+
+      function setActiveTab(tab) {
+        uiState.activeTab = tab === "dashboard" ? "dashboard" : "editor";
+        const dashboardActive = uiState.activeTab === "dashboard";
+
+        elements.editorTabButton.classList.toggle("active", !dashboardActive);
+        elements.dashboardTabButton.classList.toggle("active", dashboardActive);
+        elements.editorView.classList.toggle("hidden", dashboardActive);
+        elements.dashboardView.classList.toggle("hidden", !dashboardActive);
+
+        if (dashboardActive) {
+          renderDashboard();
+        }
+      }
+
+      function renderAllowedAppsList(apps, removeAttribute) {
+        if (!apps.length) {
+          return '<div class="nav-empty">No apps selected yet.</div>';
+        }
+
+        return apps
+          .map((appInfo) => {
+            const icon = filePathToUrl(appInfo.icon);
+            const initial = (appInfo.name || "?").slice(0, 1).toUpperCase();
+
+            return `
+              <div class="allowed-app">
+                <div class="app-avatar">
+                  ${
+                    icon
+                      ? `<img src="${icon}" alt="${escapeHtml(appInfo.name)} icon" />`
+                      : `<span>${escapeHtml(initial)}</span>`
+                  }
+                </div>
+                <div class="app-meta">
+                  <strong>${escapeHtml(appInfo.name)}</strong>
+                  <span>${escapeHtml(appInfo.exe || appInfo.path || "")}</span>
+                </div>
+                <button class="tiny-button" ${removeAttribute}="${escapeHtml(appInfo.path || appInfo.exe)}" type="button">Remove</button>
+              </div>
+            `;
+          })
+          .join("");
+      }
+
       function isEditorActive() {
         return document.activeElement === elements.shortcutInput || document.activeElement === elements.bodyInput;
       }
@@ -1230,12 +2014,147 @@
         return encodeURI(`file:///${filePath.replace(/\\/g, "/")}`);
       }
 
+      function getTriggerChar() {
+        return uiState.data?.settings?.triggerChar || fallbackPayload.state.settings.triggerChar || "/";
+      }
+
+      function createEmptyDraft() {
+        return {
+          id: "",
+          shortcut: `${getTriggerChar()}new`,
+          body: "",
+          activeIn: {
+            mode: "all",
+            apps: []
+          },
+          stats: {
+            usageCount: 0,
+            lastUsedAt: ""
+          }
+        };
+      }
+
+      function pad(value, length = 2) {
+        return String(value).padStart(length, "0");
+      }
+
+      function parseSystemPlaceholder(name) {
+        const normalized = String(name || "").trim();
+        const separatorIndex = normalized.indexOf(":");
+
+        if (separatorIndex < 0) {
+          return {
+            kind: normalized.toLowerCase(),
+            format: ""
+          };
+        }
+
+        return {
+          kind: normalized.slice(0, separatorIndex).trim().toLowerCase(),
+          format: normalized.slice(separatorIndex + 1).trim()
+        };
+      }
+
+      function isSystemPlaceholder(name) {
+        return SYSTEM_PLACEHOLDER_KINDS.has(parseSystemPlaceholder(name).kind);
+      }
+
+      function formatDatePattern(now, pattern) {
+        const hours24 = now.getHours();
+        const hours12 = hours24 % 12 || 12;
+        const tokenValues = {
+          yyyy: String(now.getFullYear()),
+          yy: String(now.getFullYear()).slice(-2),
+          MMMM: MONTHS_LONG[now.getMonth()],
+          MMM: MONTHS_SHORT[now.getMonth()],
+          MM: pad(now.getMonth() + 1),
+          M: String(now.getMonth() + 1),
+          dd: pad(now.getDate()),
+          d: String(now.getDate()),
+          HH: pad(hours24),
+          H: String(hours24),
+          hh: pad(hours12),
+          h: String(hours12),
+          mm: pad(now.getMinutes()),
+          m: String(now.getMinutes()),
+          ss: pad(now.getSeconds()),
+          s: String(now.getSeconds()),
+          A: hours24 >= 12 ? "PM" : "AM",
+          a: hours24 >= 12 ? "pm" : "am"
+        };
+
+        return String(pattern || "").replace(
+          /yyyy|yy|MMMM|MMM|MM|M|dd|d|HH|H|hh|h|mm|m|ss|s|A|a/g,
+          (token) => tokenValues[token] ?? token
+        );
+      }
+
+      function formatSystemPlaceholder(name, now = new Date()) {
+        const { kind, format } = parseSystemPlaceholder(name);
+
+        switch (kind) {
+          case "date":
+            return formatDatePattern(now, format || "MMM d, yyyy");
+          case "time":
+            return formatDatePattern(now, format || "h:mm A");
+          case "datetime":
+            return formatDatePattern(now, format || "MMM d, yyyy h:mm A");
+          default:
+            return null;
+        }
+      }
+
       function getPlaceholderMatches(value) {
-        return value.match(/\{\{[^}]+\}\}/g) || [];
+        const matches = [];
+        const seen = new Set();
+        const matcher = /{{\s*([^{}]+?)\s*}}/g;
+        const input = String(value || "");
+        let match = matcher.exec(input);
+
+        while (match) {
+          const placeholder = String(match[1] || "").trim();
+          const key = placeholder.toLowerCase();
+
+          if (placeholder && !isSystemPlaceholder(key) && !seen.has(key)) {
+            seen.add(key);
+            matches.push(placeholder);
+          }
+
+          match = matcher.exec(input);
+        }
+
+        return matches;
+      }
+
+      function resolveSystemPlaceholders(value) {
+        const now = new Date();
+
+        return String(value || "").replace(/{{\s*([^{}]+?)\s*}}/g, (match, placeholder) => {
+          const replacement = formatSystemPlaceholder(placeholder, now);
+          return replacement !== null ? replacement : match;
+        });
       }
 
       function getFolders() {
         return uiState.data?.folders || [];
+      }
+
+      function getAllSnippets() {
+        return getFolders().flatMap((folder) =>
+          folder.snippets.map((snippet) => ({
+            ...snippet,
+            folderId: folder.id,
+            folderName: folder.name
+          }))
+        );
+      }
+
+      function getSelectedFolder() {
+        return getFolders().find((folder) => folder.id === uiState.selectedFolderId) || null;
+      }
+
+      function getSelectedFolderIndex() {
+        return getFolders().findIndex((folder) => folder.id === uiState.selectedFolderId);
       }
 
       function getSelectedSnippetInfo() {
@@ -1250,6 +2169,52 @@
         return null;
       }
 
+      function analyzeShortcutStatus(snippetId, shortcutValue) {
+        const value = String(shortcutValue || "").trim();
+
+        if (!value) {
+          return {
+            tone: "",
+            text: "Enter a shortcut to trigger this snippet."
+          };
+        }
+
+        const otherSnippets = getAllSnippets().filter((snippet) => snippet.id !== snippetId);
+        const duplicates = otherSnippets.filter((snippet) => snippet.shortcut === value);
+
+        if (duplicates.length > 0) {
+          const duplicate = duplicates[0];
+          return {
+            tone: "error",
+            text: `Duplicate shortcut. Another snippet in ${duplicate.folderName} already uses ${duplicate.shortcut}.`
+          };
+        }
+
+        const overlapping = otherSnippets.filter((snippet) => {
+          if (!snippet.shortcut) {
+            return false;
+          }
+
+          return snippet.shortcut.startsWith(value) || value.startsWith(snippet.shortcut);
+        });
+
+        if (overlapping.length > 0) {
+          const shortcuts = overlapping
+            .slice(0, 2)
+            .map((snippet) => snippet.shortcut)
+            .join(", ");
+          return {
+            tone: "warn",
+            text: `Overlaps with ${shortcuts}. Boundary rules wait for space, tab, enter, or punctuation before expanding.`
+          };
+        }
+
+        return {
+          tone: "ok",
+          text: "Shortcut looks unique."
+        };
+      }
+
       function ensureSelection() {
         const folders = getFolders();
 
@@ -1257,12 +2222,27 @@
           uiState.selectedFolderId = folders[0].id;
         }
 
+        const selectedFolder = getSelectedFolder();
         const current = getSelectedSnippetInfo();
 
-        if (current) {
+        if (current && (!selectedFolder || current.folder.id === selectedFolder.id)) {
           uiState.selectedFolderId = current.folder.id;
           if (!uiState.editorDraft || uiState.editorDraft.id !== current.snippet.id) {
             uiState.editorDraft = clone(current.snippet);
+          }
+          return;
+        }
+
+        if (selectedFolder) {
+          if (selectedFolder.snippets.length > 0) {
+            const nextSnippet =
+              selectedFolder.snippets.find((snippet) => snippet.id === uiState.selectedSnippetId) ||
+              selectedFolder.snippets[0];
+            uiState.selectedSnippetId = nextSnippet.id;
+            uiState.editorDraft = clone(nextSnippet);
+          } else {
+            uiState.selectedSnippetId = null;
+            uiState.editorDraft = createEmptyDraft();
           }
           return;
         }
@@ -1277,7 +2257,7 @@
         }
 
         uiState.selectedSnippetId = null;
-        uiState.editorDraft = { id: "", shortcut: "/new", body: "" };
+        uiState.editorDraft = createEmptyDraft();
       }
 
       function derivePreview(body) {
@@ -1295,6 +2275,46 @@
         uiState.toastTimer = window.setTimeout(() => {
           elements.toast.classList.add("hidden");
         }, 2400);
+      }
+
+      function closeFolderDialog(value = null) {
+        elements.folderDialogOverlay.classList.add("hidden");
+        const resolver = uiState.folderDialogResolver;
+        uiState.folderDialogResolver = null;
+
+        if (resolver) {
+          resolver(value);
+        }
+      }
+
+      function askTextValue(options = {}) {
+        const {
+          title = "Folder",
+          copy = "Choose a name.",
+          submitLabel = "Save",
+          value = "",
+          placeholder = ""
+        } = options;
+
+        if (uiState.folderDialogResolver) {
+          closeFolderDialog(null);
+        }
+
+        elements.folderDialogTitle.textContent = title;
+        elements.folderDialogCopy.textContent = copy;
+        elements.folderDialogSubmit.textContent = submitLabel;
+        elements.folderDialogInput.value = value;
+        elements.folderDialogInput.placeholder = placeholder;
+        elements.folderDialogOverlay.classList.remove("hidden");
+
+        window.requestAnimationFrame(() => {
+          elements.folderDialogInput.focus();
+          elements.folderDialogInput.select();
+        });
+
+        return new Promise((resolve) => {
+          uiState.folderDialogResolver = resolve;
+        });
       }
 
       function getFilteredFolders() {
@@ -1331,12 +2351,13 @@
         elements.folderList.innerHTML = folders
           .map((folder) => {
             const collapsed = Boolean(uiState.collapsedFolders[folder.id]);
+            const folderActive = uiState.selectedFolderId === folder.id ? "active" : "";
 
             return `
               <section class="folder-group">
-                <button class="folder-row" data-folder-toggle="${folder.id}" type="button">
+                <button class="folder-row ${folderActive}" data-folder-select="${folder.id}" type="button">
                   <span class="folder-row-main">
-                    <span class="folder-chevron">${collapsed ? "▶" : "▼"}</span>
+                    <span class="folder-chevron" data-folder-toggle="${folder.id}">${collapsed ? "▸" : "▾"}</span>
                     <span class="folder-name">${escapeHtml(folder.name)}</span>
                   </span>
                   <span class="count-badge">${folder.snippets.length}</span>
@@ -1389,7 +2410,7 @@
 
         if (nextValue.trim()) {
           elements.livePreview.classList.add("live");
-          elements.livePreview.textContent = nextValue;
+          elements.livePreview.textContent = resolveSystemPlaceholders(nextValue);
         } else {
           elements.livePreview.classList.remove("live");
           elements.livePreview.textContent = "Your snippet preview will appear here.";
@@ -1406,31 +2427,45 @@
 
       function syncEditor() {
         const current = getSelectedSnippetInfo();
-        const folderName = current?.folder?.name || "General";
-        const draft = uiState.editorDraft || { shortcut: "/new", body: "" };
+        const folder = current?.folder || getSelectedFolder();
+        const draft = uiState.editorDraft || createEmptyDraft();
+        const folderName = folder?.name || "General";
         elements.folderPill.textContent = folderName;
         elements.shortcutInput.value = draft.shortcut || "";
         elements.bodyInput.value = draft.body || "";
-        onShortcut(draft.shortcut || "/new");
+        onShortcut(draft.shortcut || createEmptyDraft().shortcut);
         onBody(draft.body || "");
+        renderShortcutStatus();
+        renderSnippetScope();
+        renderSnippetStats();
+        renderDashboard();
+        renderCommandBar();
       }
 
       function syncEditorChrome() {
         const current = getSelectedSnippetInfo();
-        const folderName = current?.folder?.name || "General";
-        const draft = uiState.editorDraft || { shortcut: "/new", body: "" };
+        const folder = current?.folder || getSelectedFolder();
+        const draft = uiState.editorDraft || createEmptyDraft();
+        const folderName = folder?.name || "General";
         elements.folderPill.textContent = folderName;
-        onShortcut(draft.shortcut || "/new");
+        onShortcut(draft.shortcut || createEmptyDraft().shortcut);
         onBody(draft.body || "");
+        renderShortcutStatus();
+        renderSnippetScope();
+        renderSnippetStats();
+        renderDashboard();
+        renderCommandBar();
       }
 
       function renderSettings() {
         const settings = uiState.data?.settings || fallbackPayload.state.settings;
+        applyTheme(settings.theme);
         elements.launchToggle.checked = Boolean(settings.launchOnStartup);
         elements.triggerInput.value = settings.triggerChar || "/";
         elements.modeGlobal.checked = settings.activeIn.mode === "global";
         elements.modeAllowlist.checked = settings.activeIn.mode === "allowlist";
         elements.allowlistTools.style.display = settings.activeIn.mode === "allowlist" ? "block" : "none";
+        renderThemePicker();
 
         const apps = settings.activeIn.apps || [];
 
@@ -1439,29 +2474,163 @@
           return;
         }
 
-        elements.allowedApps.innerHTML = apps
-          .map((appInfo) => {
-            const icon = filePathToUrl(appInfo.icon);
-            const initial = (appInfo.name || "?").slice(0, 1).toUpperCase();
+        elements.allowedApps.innerHTML = renderAllowedAppsList(apps, "data-remove-app");
+      }
+
+      function renderSnippetScope() {
+        const current = getSelectedSnippetInfo();
+        const hasSnippet = Boolean(current?.snippet?.id);
+        const activeIn = getSnippetActiveIn(uiState.editorDraft);
+        const isSpecific = hasSnippet && activeIn.mode === "specific";
+
+        elements.snippetScopeAllButton.classList.toggle("active", !isSpecific);
+        elements.snippetScopeSpecificButton.classList.toggle("active", isSpecific);
+        elements.snippetScopeAllButton.disabled = !hasSnippet;
+        elements.snippetScopeSpecificButton.disabled = !hasSnippet;
+        elements.addSnippetAppButton.disabled = !hasSnippet;
+        elements.pickSnippetAppButton.disabled = !hasSnippet;
+        elements.snippetAppsTools.style.display = isSpecific ? "flex" : "none";
+
+        if (!hasSnippet) {
+          elements.snippetApps.innerHTML = '<div class="nav-empty">Create a snippet to target specific apps.</div>';
+          return;
+        }
+
+        if (!isSpecific) {
+          const savedApps = activeIn.apps.length
+            ? " Selected apps stay saved if you switch back later."
+            : "";
+          elements.snippetApps.innerHTML = `<div class="nav-empty">This snippet works anywhere allowed by global settings.${savedApps}</div>`;
+          return;
+        }
+
+        elements.snippetApps.innerHTML = renderAllowedAppsList(activeIn.apps, "data-remove-snippet-app");
+      }
+
+      function renderSnippetStats() {
+        const current = getSelectedSnippetInfo();
+        const stats = getSnippetStats(current?.snippet || uiState.editorDraft);
+        const usageCount = stats.usageCount;
+        elements.usageCount.textContent = `${usageCount} ${usageCount === 1 ? "time" : "times"}`;
+        elements.lastUsedAt.textContent = formatLastUsedAt(stats.lastUsedAt);
+      }
+
+      function renderEmptyBars(target, message) {
+        target.innerHTML = `<div class="nav-empty">${escapeHtml(message)}</div>`;
+      }
+
+      function renderBarRows(target, items, options = {}) {
+        if (!items.length) {
+          renderEmptyBars(target, options.emptyMessage || "No usage data yet.");
+          return;
+        }
+
+        const maxValue = Math.max(...items.map((item) => item.value), 0);
+
+        if (maxValue <= 0) {
+          renderEmptyBars(target, options.emptyMessage || "No usage data yet.");
+          return;
+        }
+
+        target.innerHTML = items
+          .map((item) => {
+            const width = Math.max(8, Math.round((item.value / maxValue) * 100));
 
             return `
-              <div class="allowed-app">
-                <div class="app-avatar">
-                  ${
-                    icon
-                      ? `<img src="${icon}" alt="${escapeHtml(appInfo.name)} icon" />`
-                      : `<span>${escapeHtml(initial)}</span>`
-                  }
+              <div class="bar-row">
+                <div class="bar-meta">
+                  <span>${escapeHtml(item.label)}</span>
+                  <span>${escapeHtml(String(item.value))}</span>
                 </div>
-                <div class="app-meta">
-                  <strong>${escapeHtml(appInfo.name)}</strong>
-                  <span>${escapeHtml(appInfo.exe || appInfo.path || "")}</span>
+                <div class="bar-track">
+                  <div class="bar-fill" style="width: ${width}%"></div>
                 </div>
-                <button class="tiny-button" data-remove-app="${escapeHtml(appInfo.path || appInfo.exe)}" type="button">Remove</button>
               </div>
             `;
           })
           .join("");
+      }
+
+      function renderDashboard() {
+        const folders = getFolders();
+        const snippets = getAllSnippets().map((snippet) => ({
+          ...snippet,
+          stats: getSnippetStats(snippet)
+        }));
+        const totalUsage = snippets.reduce((sum, snippet) => sum + snippet.stats.usageCount, 0);
+        const selectedInfo = getSelectedSnippetInfo();
+        const selectedSnippet = selectedInfo?.snippet || uiState.editorDraft || null;
+        const selectedStats = getSnippetStats(selectedSnippet);
+
+        elements.dashboardTotalSnippets.textContent = String(snippets.length);
+        elements.dashboardTotalFolders.textContent = String(folders.length);
+        elements.dashboardTotalUsage.textContent = `${totalUsage}`;
+        elements.dashboardCurrentSnippetUsage.textContent = `${selectedStats.usageCount}`;
+        elements.dashboardSelectedSnippetLabel.textContent = selectedSnippet?.shortcut
+          ? `Usage for ${selectedSnippet.shortcut}`
+          : "Usage for the active shortcut.";
+
+        const topSnippets = snippets
+          .slice()
+          .sort((left, right) => right.stats.usageCount - left.stats.usageCount || left.shortcut.localeCompare(right.shortcut))
+          .slice(0, 6)
+          .map((snippet) => ({
+            label: `${snippet.shortcut} · ${snippet.folderName}`,
+            value: snippet.stats.usageCount
+          }));
+        renderBarRows(elements.topSnippetsChart, topSnippets, {
+          emptyMessage: "Expand a few snippets to see which shortcuts lead your workflow."
+        });
+
+        const folderUsage = folders
+          .map((folder) => ({
+            label: folder.name,
+            value: folder.snippets.reduce((sum, snippet) => sum + getSnippetStats(snippet).usageCount, 0)
+          }))
+          .sort((left, right) => right.value - left.value || left.label.localeCompare(right.label));
+        renderBarRows(elements.folderUsageChart, folderUsage, {
+          emptyMessage: "Folder totals will appear once snippets have been used."
+        });
+
+        const recentSnippets = snippets
+          .filter((snippet) => snippet.stats.lastUsedAt)
+          .slice()
+          .sort((left, right) => new Date(right.stats.lastUsedAt) - new Date(left.stats.lastUsedAt))
+          .slice(0, 6);
+
+        if (!recentSnippets.length) {
+          elements.recentActivityList.innerHTML = '<div class="nav-empty">Recent usage will show up here after your first expansions.</div>';
+          return;
+        }
+
+        elements.recentActivityList.innerHTML = recentSnippets
+          .map((snippet) => `
+            <div class="activity-item">
+              <strong>${escapeHtml(snippet.shortcut)} · ${escapeHtml(snippet.folderName)}</strong>
+              <span>${escapeHtml(formatLastUsedAt(snippet.stats.lastUsedAt))} · ${escapeHtml(derivePreview(snippet.body))}</span>
+            </div>
+          `)
+          .join("");
+      }
+
+      function renderCommandBar() {
+        const selectedFolder = getSelectedFolder();
+        const folderIndex = getSelectedFolderIndex();
+        const current = getSelectedSnippetInfo();
+        const hasSnippet = Boolean(current?.snippet?.id);
+        const totalFolders = getFolders().length;
+
+        elements.renameFolderButton.disabled = !selectedFolder;
+        elements.deleteFolderButton.disabled = !selectedFolder || totalFolders <= 1;
+        elements.moveFolderUpButton.disabled = !selectedFolder || folderIndex <= 0;
+        elements.moveFolderDownButton.disabled = !selectedFolder || folderIndex < 0 || folderIndex >= totalFolders - 1;
+        elements.deleteSnippetButton.disabled = !hasSnippet;
+      }
+
+      function renderShortcutStatus() {
+        const status = analyzeShortcutStatus(uiState.editorDraft?.id, uiState.editorDraft?.shortcut);
+        elements.shortcutStatus.textContent = status.text;
+        elements.shortcutStatus.className = `shortcut-status${status.tone ? ` ${status.tone}` : ""}`;
       }
 
       function hydrate(payload, options = {}) {
@@ -1470,9 +2639,19 @@
         uiState.meta = payload.meta || uiState.meta;
         ensureSelection();
 
-        if (!preserveDraft) {
+        if (preserveDraft) {
           const current = getSelectedSnippetInfo();
-          uiState.editorDraft = current ? clone(current.snippet) : { id: "", shortcut: "/new", body: "" };
+
+          if (current && uiState.editorDraft && current.snippet.id === uiState.editorDraft.id) {
+            uiState.editorDraft = {
+              ...clone(current.snippet),
+              shortcut: uiState.editorDraft.shortcut,
+              body: uiState.editorDraft.body
+            };
+          }
+        } else {
+          const current = getSelectedSnippetInfo();
+          uiState.editorDraft = current ? clone(current.snippet) : createEmptyDraft();
         }
 
         renderNavigation();
@@ -1484,6 +2663,8 @@
         }
 
         renderSettings();
+        renderDashboard();
+        setActiveTab(uiState.activeTab);
       }
 
       function pick(el, shortcut, preview, body) {
@@ -1495,7 +2676,31 @@
         }
 
         const current = getSelectedSnippetInfo();
-        uiState.editorDraft = current ? clone(current.snippet) : { id: "", shortcut, body };
+        uiState.editorDraft = current ? clone(current.snippet) : { ...createEmptyDraft(), shortcut, body };
+        syncEditor();
+      }
+
+      function selectFolder(folderId, options = {}) {
+        const folder = getFolders().find((item) => item.id === folderId);
+
+        if (!folder) {
+          return;
+        }
+
+        uiState.selectedFolderId = folder.id;
+        const preferredSnippetId = options.preferredSnippetId || uiState.selectedSnippetId;
+
+        if (folder.snippets.length > 0) {
+          const nextSnippet =
+            folder.snippets.find((snippet) => snippet.id === preferredSnippetId) || folder.snippets[0];
+          uiState.selectedSnippetId = nextSnippet.id;
+          uiState.editorDraft = clone(nextSnippet);
+        } else {
+          uiState.selectedSnippetId = null;
+          uiState.editorDraft = createEmptyDraft();
+        }
+
+        renderNavigation();
         syncEditor();
       }
 
@@ -1529,35 +2734,51 @@
         }
       }
 
-      async function queueSaveSnippet() {
+      async function saveDraftNow(options = {}) {
+        const { silent = false } = options;
+        const draft = uiState.editorDraft;
+
+        if (!draft || !draft.id) {
+          if (!silent) {
+            showToast("Select a snippet before saving.");
+          }
+          return;
+        }
+
+        const patch = {
+          shortcut: draft.shortcut.trim() || createEmptyDraft().shortcut,
+          body: draft.body,
+          activeIn: getSnippetActiveIn(draft)
+        };
+
+        if (!bridge) {
+          patchLocalSnippet(draft.id, patch);
+          renderNavigation();
+          syncEditorChrome();
+          if (!silent) {
+            showToast("Snippet saved.");
+          }
+          return;
+        }
+
+        const result = await bridge.updateSnippet(draft.id, patch);
+
+        if (!result.ok) {
+          showToast(result.error || "Unable to save snippet.");
+          return;
+        }
+
+        hydrate(result, { preserveDraft: true });
+
+        if (!silent) {
+          showToast("Snippet saved.");
+        }
+      }
+
+      function queueSaveSnippet() {
         clearTimeout(uiState.saveTimer);
-
-        uiState.saveTimer = window.setTimeout(async () => {
-          const draft = uiState.editorDraft;
-
-          if (!draft || !draft.id) {
-            return;
-          }
-
-          const patch = {
-            shortcut: draft.shortcut.trim() || "/new",
-            body: draft.body
-          };
-
-          if (!bridge) {
-            patchLocalSnippet(draft.id, patch);
-            renderNavigation();
-            return;
-          }
-
-          const result = await bridge.updateSnippet(draft.id, patch);
-
-          if (!result.ok) {
-            showToast(result.error || "Unable to save snippet.");
-            return;
-          }
-
-          hydrate(result, { preserveDraft: true });
+        uiState.saveTimer = window.setTimeout(() => {
+          void saveDraftNow({ silent: true });
         }, 180);
       }
 
@@ -1614,28 +2835,51 @@
       }
 
       async function createFolder() {
-        const name = window.prompt("Folder name", "General");
+        const name = await askTextValue({
+          title: "Create Folder",
+          copy: "Choose a clear folder name for this group of snippets.",
+          submitLabel: "Create",
+          value: "New Folder",
+          placeholder: "Folder name"
+        });
 
         if (!name) {
           return;
         }
 
-        if (!bridge) {
-          const id = `folder_${Date.now()}`;
-          uiState.data.folders.push({ id, name, snippets: [] });
-          uiState.selectedFolderId = id;
-          renderNavigation();
+        const nextName = name.trim();
+
+        if (!nextName) {
+          showToast("Folder name cannot be empty.");
           return;
         }
 
-        const result = await bridge.createFolder(name);
+        if (!bridge) {
+          const id = `folder_${Date.now()}`;
+          uiState.data.folders.push({ id, name: nextName, snippets: [] });
+          uiState.searchTerm = "";
+          elements.searchInput.value = "";
+          uiState.selectedFolderId = id;
+          uiState.selectedSnippetId = null;
+          uiState.editorDraft = createEmptyDraft();
+          renderNavigation();
+          syncEditor();
+          showToast(`Created folder "${nextName}".`);
+          return;
+        }
+
+        const result = await bridge.createFolder(nextName);
 
         if (!result.ok) {
           showToast(result.error || "Unable to create folder.");
           return;
         }
 
+        uiState.searchTerm = "";
+        elements.searchInput.value = "";
         hydrate(result, { preserveDraft: true });
+        selectFolder(result.folder.id);
+        showToast(`Created folder "${nextName}".`);
       }
 
       async function createSnippet() {
@@ -1651,7 +2895,15 @@
           const snippet = {
             id: `snip_${Date.now()}`,
             shortcut: `${uiState.data.settings.triggerChar || "/"}new`,
-            body: ""
+            body: "",
+            activeIn: {
+              mode: "all",
+              apps: []
+            },
+            stats: {
+              usageCount: 0,
+              lastUsedAt: ""
+            }
           };
           folder.snippets.unshift(snippet);
           uiState.selectedFolderId = folder.id;
@@ -1703,6 +2955,307 @@
         hydrate(result);
       }
 
+      async function renameSelectedSnippet() {
+        const current = getSelectedSnippetInfo();
+
+        if (!current) {
+          return;
+        }
+
+        const value = await askTextValue({
+          title: "Rename Shortcut",
+          copy: "Update the trigger text for this snippet.",
+          submitLabel: "Rename",
+          value: current.snippet.shortcut,
+          placeholder: "Shortcut"
+        });
+
+        if (!value) {
+          return;
+        }
+
+        const nextShortcut = value.trim();
+
+        if (!nextShortcut) {
+          showToast("Shortcut cannot be empty.");
+          return;
+        }
+
+        uiState.editorDraft = {
+          ...clone(current.snippet),
+          shortcut: nextShortcut
+        };
+
+        await saveDraftNow();
+      }
+
+      function closeSnippetContextMenu() {
+        uiState.snippetContextSnippetId = null;
+        elements.snippetContextMenu.classList.add("hidden");
+      }
+
+      function openSnippetContextMenu(event, snippetButton) {
+        if (!snippetButton) {
+          return;
+        }
+
+        event.preventDefault();
+        pick(
+          snippetButton,
+          snippetButton.dataset.shortcut,
+          snippetButton.dataset.preview,
+          snippetButton.dataset.body
+        );
+        uiState.snippetContextSnippetId = snippetButton.dataset.snippetId;
+        elements.snippetContextMenu.classList.remove("hidden");
+
+        const menuWidth = 180;
+        const menuHeight = 92;
+        const nextX = Math.min(event.clientX, window.innerWidth - menuWidth - 12);
+        const nextY = Math.min(event.clientY, window.innerHeight - menuHeight - 12);
+        elements.snippetContextMenu.style.left = `${Math.max(12, nextX)}px`;
+        elements.snippetContextMenu.style.top = `${Math.max(12, nextY)}px`;
+      }
+
+      async function renameSelectedFolder() {
+        const folder = getSelectedFolder();
+
+        if (!folder) {
+          return;
+        }
+
+        const name = await askTextValue({
+          title: "Rename Folder",
+          copy: "Update the folder name shown in the sidebar.",
+          submitLabel: "Rename",
+          value: folder.name,
+          placeholder: "Folder name"
+        });
+
+        if (!name) {
+          return;
+        }
+
+        const nextName = name.trim();
+
+        if (!nextName) {
+          showToast("Folder name cannot be empty.");
+          return;
+        }
+
+        if (!bridge) {
+          folder.name = nextName;
+          renderNavigation();
+          syncEditorChrome();
+          showToast(`Renamed folder to "${nextName}".`);
+          return;
+        }
+
+        const result = await bridge.updateFolder(folder.id, { name: nextName });
+
+        if (!result.ok) {
+          showToast(result.error || "Unable to rename folder.");
+          return;
+        }
+
+        hydrate(result, { preserveDraft: true });
+        selectFolder(folder.id);
+        showToast(`Renamed folder to "${nextName}".`);
+      }
+
+      async function deleteSelectedFolder() {
+        const folder = getSelectedFolder();
+
+        if (!folder) {
+          return;
+        }
+
+        if (getFolders().length <= 1) {
+          showToast("Keep at least one folder in SnapType.");
+          return;
+        }
+
+        if (!window.confirm(`Delete the "${folder.name}" folder?`)) {
+          return;
+        }
+
+        if (!bridge) {
+          uiState.data.folders = getFolders().filter((item) => item.id !== folder.id);
+          uiState.selectedFolderId = null;
+          uiState.selectedSnippetId = null;
+          ensureSelection();
+          renderNavigation();
+          syncEditor();
+          showToast(`Deleted folder "${folder.name}".`);
+          return;
+        }
+
+        const result = await bridge.deleteFolder(folder.id);
+
+        if (!result.ok) {
+          showToast(result.error || "Unable to delete folder.");
+          return;
+        }
+
+        uiState.selectedFolderId = null;
+        uiState.selectedSnippetId = null;
+        hydrate(result);
+        showToast(`Deleted folder "${folder.name}".`);
+      }
+
+      async function moveSelectedFolder(direction) {
+        const folder = getSelectedFolder();
+
+        if (!folder) {
+          return;
+        }
+
+        if (!bridge) {
+          const folders = getFolders();
+          const index = folders.findIndex((item) => item.id === folder.id);
+          const targetIndex = direction === "up" ? index - 1 : index + 1;
+
+          if (targetIndex < 0 || targetIndex >= folders.length) {
+            return;
+          }
+
+          const [item] = folders.splice(index, 1);
+          folders.splice(targetIndex, 0, item);
+          renderNavigation();
+          syncEditorChrome();
+          return;
+        }
+
+        const result = await bridge.moveFolder(folder.id, direction);
+
+        if (!result.ok) {
+          showToast(result.error || "Unable to move folder.");
+          return;
+        }
+
+        hydrate(result, { preserveDraft: true });
+        selectFolder(folder.id);
+      }
+
+      async function updateSnippetScope(mode) {
+        const current = getSelectedSnippetInfo();
+
+        if (!current) {
+          showToast("Select a saved snippet first.");
+          return;
+        }
+
+        uiState.editorDraft.activeIn = {
+          ...getSnippetActiveIn(uiState.editorDraft),
+          mode
+        };
+
+        if (!bridge) {
+          patchLocalSnippet(current.snippet.id, {
+            activeIn: getSnippetActiveIn(uiState.editorDraft)
+          });
+          syncEditorChrome();
+          return;
+        }
+
+        const result = await bridge.updateSnippet(current.snippet.id, {
+          activeIn: {
+            mode
+          }
+        });
+
+        if (!result.ok) {
+          showToast(result.error || "Unable to update snippet scope.");
+          return;
+        }
+
+        hydrate(result, { preserveDraft: true });
+        syncEditorChrome();
+      }
+
+      async function chooseSnippetApp() {
+        const current = getSelectedSnippetInfo();
+
+        if (!current) {
+          showToast("Select a saved snippet first.");
+          return;
+        }
+
+        if (!bridge?.chooseSnippetApp) {
+          showToast("Available inside the packaged Electron app.");
+          return;
+        }
+
+        const result = await bridge.chooseSnippetApp(current.snippet.id);
+
+        if (!result.ok) {
+          showToast(result.error || "Unable to add snippet app.");
+          return;
+        }
+
+        if (!result.canceled) {
+          hydrate(result, { preserveDraft: true });
+          syncEditorChrome();
+        }
+      }
+
+      async function pickSnippetApp() {
+        const current = getSelectedSnippetInfo();
+
+        if (!current) {
+          showToast("Select a saved snippet first.");
+          return;
+        }
+
+        if (!bridge?.pickSnippetApp) {
+          showToast("Available inside the packaged Electron app.");
+          return;
+        }
+
+        showToast("Switch to the target app now.");
+        await sleep(1200);
+        const result = await bridge.pickSnippetApp(current.snippet.id);
+
+        if (!result.ok) {
+          showToast(result.error || "Unable to capture snippet app.");
+          return;
+        }
+
+        hydrate(result, { preserveDraft: true });
+        syncEditorChrome();
+      }
+
+      async function removeSnippetApp(pathOrExe) {
+        const current = getSelectedSnippetInfo();
+
+        if (!current) {
+          return;
+        }
+
+        if (!bridge?.removeSnippetApp) {
+          const activeIn = getSnippetActiveIn(uiState.editorDraft);
+          activeIn.apps = activeIn.apps.filter((item) => {
+            const matchesPath = item.path && item.path === pathOrExe;
+            const matchesExe = item.exe && item.exe === pathOrExe;
+            return !(matchesPath || matchesExe);
+          });
+          uiState.editorDraft.activeIn = activeIn;
+          patchLocalSnippet(current.snippet.id, { activeIn });
+          syncEditorChrome();
+          return;
+        }
+
+        const result = await bridge.removeSnippetApp(current.snippet.id, pathOrExe);
+
+        if (!result.ok) {
+          showToast(result.error || "Unable to remove snippet app.");
+          return;
+        }
+
+        hydrate(result, { preserveDraft: true });
+        syncEditorChrome();
+      }
+
       function bindWindowControls() {
         elements.minimizeWindow.addEventListener("click", async () => {
           if (bridge?.windowControls?.minimize) {
@@ -1728,6 +3281,8 @@
 
       function bindNavigation() {
         elements.folderList.addEventListener("click", (event) => {
+          closeSnippetContextMenu();
+
           const folderToggle = event.target.closest("[data-folder-toggle]");
 
           if (folderToggle) {
@@ -1737,11 +3292,29 @@
             return;
           }
 
+          const folderSelect = event.target.closest("[data-folder-select]");
+
+          if (folderSelect) {
+            selectFolder(folderSelect.dataset.folderSelect);
+            return;
+          }
+
           const snippetButton = event.target.closest("[data-snippet-id]");
 
           if (snippetButton) {
             pick(snippetButton, snippetButton.dataset.shortcut, snippetButton.dataset.preview, snippetButton.dataset.body);
           }
+        });
+
+        elements.folderList.addEventListener("contextmenu", (event) => {
+          const snippetButton = event.target.closest("[data-snippet-id]");
+
+          if (snippetButton) {
+            openSnippetContextMenu(event, snippetButton);
+            return;
+          }
+
+          closeSnippetContextMenu();
         });
       }
 
@@ -1753,6 +3326,7 @@
 
           uiState.editorDraft.shortcut = elements.shortcutInput.value;
           onShortcut(elements.shortcutInput.value);
+          renderShortcutStatus();
           updateSelectedNavText();
           queueSaveSnippet();
         });
@@ -1772,6 +3346,14 @@
           insertPH();
         });
 
+        elements.insertDateButton.addEventListener("click", () => {
+          insertTextAtCursor("{{date}}");
+        });
+
+        elements.insertTimeButton.addEventListener("click", () => {
+          insertTextAtCursor("{{time}}");
+        });
+
         elements.insertNewlineButton.addEventListener("click", () => {
           insertTextAtCursor("\n");
         });
@@ -1782,6 +3364,193 @@
 
         elements.deleteSnippetButton.addEventListener("click", () => {
           void deleteSelectedSnippet();
+        });
+
+        elements.snippetScopeAllButton.addEventListener("click", () => {
+          void updateSnippetScope("all");
+        });
+
+        elements.snippetScopeSpecificButton.addEventListener("click", () => {
+          void updateSnippetScope("specific");
+        });
+
+        elements.addSnippetAppButton.addEventListener("click", () => {
+          void chooseSnippetApp();
+        });
+
+        elements.pickSnippetAppButton.addEventListener("click", () => {
+          void pickSnippetApp();
+        });
+
+        elements.snippetApps.addEventListener("click", (event) => {
+          const removeButton = event.target.closest("[data-remove-snippet-app]");
+
+          if (removeButton) {
+            void removeSnippetApp(removeButton.dataset.removeSnippetApp);
+          }
+        });
+      }
+
+      function bindCommandBar() {
+        elements.renameFolderButton.addEventListener("click", () => {
+          closeSnippetContextMenu();
+          void renameSelectedFolder();
+        });
+
+        elements.moveFolderUpButton.addEventListener("click", () => {
+          closeSnippetContextMenu();
+          void moveSelectedFolder("up");
+        });
+
+        elements.moveFolderDownButton.addEventListener("click", () => {
+          closeSnippetContextMenu();
+          void moveSelectedFolder("down");
+        });
+
+        elements.deleteFolderButton.addEventListener("click", () => {
+          closeSnippetContextMenu();
+          void deleteSelectedFolder();
+        });
+      }
+
+      function bindSnippetContextMenu() {
+        elements.renameSnippetMenuAction.addEventListener("click", () => {
+          closeSnippetContextMenu();
+          void renameSelectedSnippet();
+        });
+
+        elements.deleteSnippetMenuAction.addEventListener("click", () => {
+          closeSnippetContextMenu();
+          void deleteSelectedSnippet();
+        });
+
+        window.addEventListener("click", (event) => {
+          if (!event.target.closest("#snippetContextMenu")) {
+            closeSnippetContextMenu();
+          }
+        });
+
+        window.addEventListener("resize", () => {
+          closeSnippetContextMenu();
+        });
+
+        window.addEventListener("blur", () => {
+          closeSnippetContextMenu();
+        });
+      }
+
+      function bindFolderDialog() {
+        elements.folderDialogCancel.addEventListener("click", () => {
+          closeFolderDialog(null);
+        });
+
+        elements.folderDialogOverlay.addEventListener("click", (event) => {
+          if (event.target === elements.folderDialogOverlay) {
+            closeFolderDialog(null);
+          }
+        });
+
+        elements.folderDialogForm.addEventListener("submit", (event) => {
+          event.preventDefault();
+          closeFolderDialog(elements.folderDialogInput.value);
+        });
+      }
+
+      function isTextEntryTarget(target) {
+        if (!target) {
+          return false;
+        }
+
+        const tagName = target.tagName;
+        return (
+          target.isContentEditable ||
+          tagName === "INPUT" ||
+          tagName === "TEXTAREA" ||
+          tagName === "SELECT"
+        );
+      }
+
+      function navigateVisibleSnippets(direction) {
+        const items = Array.from(document.querySelectorAll(".snippet-item"));
+
+        if (!items.length) {
+          return;
+        }
+
+        const currentIndex = items.findIndex((item) => item.dataset.snippetId === uiState.selectedSnippetId);
+        const nextIndex =
+          currentIndex < 0
+            ? 0
+            : Math.min(Math.max(0, currentIndex + direction), items.length - 1);
+        const nextItem = items[nextIndex];
+
+        if (nextItem) {
+          pick(nextItem, nextItem.dataset.shortcut, nextItem.dataset.preview, nextItem.dataset.body);
+        }
+      }
+
+      function bindKeyboardShortcuts() {
+        window.addEventListener("keydown", (event) => {
+          const key = event.key.toLowerCase();
+
+          if (!elements.snippetContextMenu.classList.contains("hidden")) {
+            if (event.key === "Escape") {
+              event.preventDefault();
+              closeSnippetContextMenu();
+            }
+            return;
+          }
+
+          if (!elements.folderDialogOverlay.classList.contains("hidden")) {
+            if (event.key === "Escape") {
+              event.preventDefault();
+              closeFolderDialog(null);
+            }
+            return;
+          }
+
+          if ((event.ctrlKey || event.metaKey) && key === "n") {
+            event.preventDefault();
+            void createSnippet();
+            return;
+          }
+
+          if ((event.ctrlKey || event.metaKey) && key === "s") {
+            event.preventDefault();
+            void saveDraftNow();
+            return;
+          }
+
+          if (!elements.settingsOverlay.classList.contains("hidden") && event.key === "Escape") {
+            event.preventDefault();
+            closeSettings();
+            return;
+          }
+
+          if (event.ctrlKey || event.metaKey || event.altKey) {
+            return;
+          }
+
+          if (isTextEntryTarget(event.target)) {
+            return;
+          }
+
+          if (event.key === "ArrowDown") {
+            event.preventDefault();
+            navigateVisibleSnippets(1);
+            return;
+          }
+
+          if (event.key === "ArrowUp") {
+            event.preventDefault();
+            navigateVisibleSnippets(-1);
+            return;
+          }
+
+          if (event.key === "Delete") {
+            event.preventDefault();
+            void deleteSelectedSnippet();
+          }
         });
       }
 
@@ -1805,6 +3574,16 @@
           uiState.settingsTimer = window.setTimeout(() => {
             void updateSettings({ triggerChar: elements.triggerInput.value || "/" });
           }, 180);
+        });
+
+        elements.themePicker.addEventListener("click", (event) => {
+          const themeButton = event.target.closest("[data-theme-choice]");
+
+          if (!themeButton) {
+            return;
+          }
+
+          void updateSettings({ theme: themeButton.dataset.themeChoice });
         });
 
         document.querySelectorAll('input[name="activeMode"]').forEach((radio) => {
@@ -1894,7 +3673,11 @@
         bindWindowControls();
         bindNavigation();
         bindEditor();
+        bindCommandBar();
+        bindSnippetContextMenu();
+        bindFolderDialog();
         bindSettings();
+        bindKeyboardShortcuts();
 
         elements.searchInput.addEventListener("input", () => {
           uiState.searchTerm = elements.searchInput.value;
@@ -1907,6 +3690,14 @@
 
         elements.newSnippetButton.addEventListener("click", () => {
           void createSnippet();
+        });
+
+        elements.editorTabButton.addEventListener("click", () => {
+          setActiveTab("editor");
+        });
+
+        elements.dashboardTabButton.addEventListener("click", () => {
+          setActiveTab("dashboard");
         });
 
         if (bridge?.onStateChanged) {
