@@ -1,10 +1,34 @@
 const form = document.querySelector('#popupForm');
 const title = document.querySelector('#popupTitle');
 const meta = document.querySelector('#popupMeta');
+const errorText = document.querySelector('#popupError');
 const cancelButton = document.querySelector('#cancelButton');
 const closeButton = document.querySelector('#closeButton');
+const submitButton = document.querySelector('button[type="submit"]');
 
 let currentPayload = null;
+let isSubmitting = false;
+
+function setError(message = '') {
+  errorText.textContent = String(message || '').trim();
+}
+
+function setSubmitting(nextValue) {
+  isSubmitting = Boolean(nextValue);
+
+  if (submitButton) {
+    submitButton.disabled = isSubmitting;
+    submitButton.textContent = isSubmitting ? 'Inserting...' : 'Insert';
+  }
+
+  if (cancelButton) {
+    cancelButton.disabled = isSubmitting;
+  }
+
+  if (closeButton) {
+    closeButton.disabled = isSubmitting;
+  }
+}
 
 function capitalize(value) {
   return value ? `${value.charAt(0).toUpperCase()}${value.slice(1)}` : value;
@@ -21,6 +45,8 @@ function fieldIdFor(placeholder, index) {
 
 function render(payload) {
   currentPayload = payload;
+  setSubmitting(false);
+  setError('');
   title.textContent = payload.placeholders.length > 0 ? 'Fill placeholders' : 'Ready to insert';
   meta.textContent = payload.placeholders.length > 0
     ? `Add values for ${payload.shortcut || 'this snippet'} before SnapType types it into your active app.`
@@ -53,6 +79,10 @@ function render(payload) {
 }
 
 async function cancel() {
+  if (isSubmitting) {
+    return;
+  }
+
   await window.snaptype.cancelPopup();
 }
 
@@ -63,9 +93,12 @@ window.snaptype.onPopupOpen((payload) => {
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
 
-  if (!currentPayload) {
+  if (!currentPayload || isSubmitting) {
     return;
   }
+
+  setError('');
+  setSubmitting(true);
 
   const formData = new FormData(form);
   const values = {};
@@ -74,7 +107,18 @@ form.addEventListener('submit', async (event) => {
     values[placeholder] = String(formData.get(placeholder) || '');
   });
 
-  await window.snaptype.submitPopup(values);
+  try {
+    const result = await window.snaptype.submitPopup(values);
+
+    if (!result?.ok) {
+      setError(result?.error || 'Could not insert snippet text. Please try again.');
+      setSubmitting(false);
+      return;
+    }
+  } catch (error) {
+    setError(error instanceof Error ? error.message : 'Could not insert snippet text. Please try again.');
+    setSubmitting(false);
+  }
 });
 
 cancelButton.addEventListener('click', () => {

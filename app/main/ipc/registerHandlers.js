@@ -40,7 +40,7 @@ async function waitForTargetAppFocus(targetApp, pollActiveApp, isOwnWindow) {
   await sleep(POPUP_HIDE_SETTLE_MS);
 
   if (!targetApp) {
-    return;
+    return true;
   }
 
   const deadline = Date.now() + POPUP_FOCUS_TIMEOUT_MS;
@@ -49,11 +49,13 @@ async function waitForTargetAppFocus(targetApp, pollActiveApp, isOwnWindow) {
     const activeApp = await pollActiveApp();
 
     if (activeApp && !isOwnWindow(activeApp) && isSameApp(activeApp, targetApp)) {
-      return;
+      return true;
     }
 
     await sleep(POPUP_FOCUS_POLL_MS);
   }
+
+  return false;
 }
 
 function registerIpcHandlers(context) {
@@ -304,20 +306,37 @@ function registerIpcHandlers(context) {
     const pendingExpansion = getPendingExpansion();
 
     if (!pendingExpansion) {
-      return wrapError(new Error('No placeholder expansion is pending.'));
+      return {
+        ok: false,
+        error: 'No placeholder expansion is pending.'
+      };
     }
 
     try {
       const text = `${resolvePlaceholders(pendingExpansion.snippet.body, values)}${pendingExpansion.trailingText || ''}`;
       windows.hidePopup();
-      await waitForTargetAppFocus(pendingExpansion.targetApp, pollActiveApp, isOwnWindow);
+      const focusedTargetApp = await waitForTargetAppFocus(pendingExpansion.targetApp, pollActiveApp, isOwnWindow);
+
+      if (!focusedTargetApp) {
+        throw new Error('Could not return focus to the target app. Bring it to front and try Insert again.');
+      }
+
       await typeExpandedText(text);
       recordSnippetUsage?.(pendingExpansion.snippet.id);
       finishExpansion();
       return { ok: true };
     } catch (error) {
-      finishExpansion();
-      return wrapError(error);
+      await windows.showPopup({
+        shortcut: pendingExpansion.snippet.shortcut,
+        body: pendingExpansion.snippet.body,
+        placeholders: pendingExpansion.placeholders
+      });
+
+      const message = error instanceof Error ? error.message : 'Could not insert snippet text.';
+      return {
+        ok: false,
+        error: message
+      };
     }
   });
 

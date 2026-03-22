@@ -58,8 +58,8 @@ class WindowManager {
     }
 
     this.popupWindow = new BrowserWindow({
-      width: 380,
-      height: 240,
+      width: 420,
+      height: 320,
       show: false,
       resizable: false,
       minimizable: false,
@@ -128,10 +128,11 @@ class WindowManager {
     const popup = this.createPopupWindow();
     await this.popupLoadPromise;
 
-    const height = Math.min(520, Math.max(210, 148 + (payload.placeholders?.length || 0) * 68));
+    const placeholderCount = payload.placeholders?.length || 0;
+    const height = Math.min(620, Math.max(300, 210 + placeholderCount * 72));
     popup.setBounds({
       ...popup.getBounds(),
-      width: 380,
+      width: 420,
       height
     });
     this.positionPopupNearCursor(popup);
