@@ -59,6 +59,20 @@ input {
   gap: 12px;
 }
 
+.popup-head-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.popup-logo {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  flex: 0 0 auto;
+}
+
 .eyebrow {
   margin: 0 0 6px;
   text-transform: uppercase;

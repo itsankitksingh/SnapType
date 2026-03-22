@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SnapType</title>
+    <link rel="icon" type="image/png" href="../../../assets/SnapType_logo.png" />
     <style>
       @import url("https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&display=swap");
 
@@ -342,15 +343,17 @@
       }
 
       .titlebar-icon {
-        display: grid;
-        place-items: center;
         width: 16px;
         height: 16px;
         border-radius: 3px;
-        background: linear-gradient(135deg, #6264a7, #8b8cc8);
-        color: #fff;
-        font-size: 9px;
-        font-weight: 700;
+        overflow: hidden;
+      }
+
+      .titlebar-icon img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        display: block;
       }
 
       .titlebar-text {
@@ -413,15 +416,17 @@
       }
 
       .brand-icon {
-        display: grid;
-        place-items: center;
         width: 32px;
         height: 32px;
         border-radius: 6px;
-        background: linear-gradient(135deg, #6264a7, #8b8cc8);
-        color: #fff;
-        font-size: 13px;
-        font-weight: 700;
+        overflow: hidden;
+      }
+
+      .brand-icon img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        display: block;
       }
 
       .brand-copy strong {
@@ -1780,7 +1785,9 @@
     <div class="window-shell">
       <header class="titlebar">
         <div class="titlebar-left">
-          <div class="titlebar-icon">S</div>
+          <div class="titlebar-icon">
+            <img src="../../../assets/SnapType_logo.png" alt="SnapType logo" />
+          </div>
           <div class="titlebar-text">SnapType — Windows Text Expander</div>
         </div>
         <div class="window-controls">
@@ -1793,7 +1800,9 @@
       <div class="layout">
         <aside class="nav-pane">
           <div class="brand-header">
-            <div class="brand-icon">ST</div>
+            <div class="brand-icon">
+              <img src="../../../assets/SnapType_logo.png" alt="SnapType logo" />
+            </div>
             <div class="brand-copy">
               <strong>SnapType</strong>
               <span>Text Expander</span>
