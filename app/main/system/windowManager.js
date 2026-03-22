@@ -28,8 +28,9 @@ class WindowManager {
       minWidth: 920,
       minHeight: 620,
       show: false,
+      frame: false,
       icon: this.iconPath,
-      backgroundColor: '#11161d',
+      backgroundColor: '#202020',
       autoHideMenuBar: true,
       webPreferences: {
         preload: this.preloadPath,

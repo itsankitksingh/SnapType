@@ -4,52 +4,1928 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SnapType</title>
-    <link rel="stylesheet" href="./index.css" />
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&display=swap");
+
+      :root {
+        color-scheme: dark;
+        --accent: #6264a7;
+        --accent-soft: #8b8cc8;
+        --accent-muted: #9496d1;
+        --accent-light: #b0b2e8;
+        --shell: #202020;
+        --nav: #2c2c2c;
+        --content: #1c1c1c;
+        --card: #262626;
+        --text-main: rgba(255, 255, 255, 0.92);
+        --text-secondary: rgba(255, 255, 255, 0.75);
+        --text-muted: rgba(255, 255, 255, 0.35);
+        --text-hint: rgba(255, 255, 255, 0.2);
+        --danger: #c42b1c;
+        --danger-soft: rgba(196, 43, 28, 0.12);
+        --danger-text: #f08070;
+        --success: #6ccb5f;
+        --warning: #ffc240;
+        --warning-bg: rgba(255, 185, 0, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background: #141414;
+        font-family: "Segoe UI", system-ui, sans-serif;
+        color: var(--text-main);
+      }
+
+      body {
+        padding: 8px;
+        overflow: hidden;
+      }
+
+      button,
+      input,
+      textarea {
+        font: inherit;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      .mono,
+      code {
+        font-family: "DM Mono", "Cascadia Code", Consolas, monospace;
+      }
+
+      .window-shell {
+        display: flex;
+        flex-direction: column;
+        min-height: calc(100vh - 16px);
+        background: var(--shell);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      .titlebar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 32px;
+        background: #2c2c2c;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        -webkit-app-region: drag;
+        user-select: none;
+      }
+
+      .titlebar-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0 12px;
+        min-width: 0;
+      }
+
+      .titlebar-icon {
+        display: grid;
+        place-items: center;
+        width: 16px;
+        height: 16px;
+        border-radius: 3px;
+        background: linear-gradient(135deg, #6264a7, #8b8cc8);
+        color: #fff;
+        font-size: 9px;
+        font-weight: 700;
+      }
+
+      .titlebar-text {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      .window-controls {
+        display: flex;
+        align-items: stretch;
+        height: 100%;
+        -webkit-app-region: no-drag;
+      }
+
+      .window-control {
+        width: 46px;
+        height: 32px;
+        border: 0;
+        background: transparent;
+        color: rgba(255, 255, 255, 0.72);
+        font-size: 12px;
+        transition: background 120ms ease, color 120ms ease;
+      }
+
+      .window-control:hover {
+        background: rgba(255, 255, 255, 0.08);
+        color: #fff;
+      }
+
+      .window-control.close:hover {
+        background: #c42b1c;
+      }
+
+      .layout {
+        display: flex;
+        flex: 1;
+        min-height: 0;
+      }
+
+      .nav-pane {
+        display: flex;
+        flex-direction: column;
+        width: 220px;
+        flex: 0 0 220px;
+        min-height: 0;
+        background: #2c2c2c;
+        border-right: 1px solid rgba(255, 255, 255, 0.06);
+      }
+
+      .brand-header {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        padding: 16px 14px 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      }
+
+      .brand-icon {
+        display: grid;
+        place-items: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        background: linear-gradient(135deg, #6264a7, #8b8cc8);
+        color: #fff;
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .brand-copy strong {
+        display: block;
+        margin-bottom: 2px;
+        font-size: 14px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.9);
+      }
+
+      .brand-copy span {
+        font-size: 10px;
+        color: rgba(255, 255, 255, 0.3);
+      }
+
+      .search-block {
+        padding: 10px;
+      }
+
+      .search-box {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        border-radius: 4px;
+        padding: 0 10px;
+      }
+
+      .search-box:focus-within {
+        border-color: #6264a7;
+        outline: 1px solid #6264a7;
+      }
+
+      .search-box svg {
+        width: 13px;
+        height: 13px;
+        fill: rgba(255, 255, 255, 0.35);
+        flex: 0 0 auto;
+      }
+
+      .search-box input {
+        width: 100%;
+        border: 0;
+        outline: 0;
+        background: transparent;
+        color: var(--text-main);
+        padding: 8px 0;
+        font-size: 12px;
+      }
+
+      .search-box input::placeholder {
+        color: rgba(255, 255, 255, 0.28);
+      }
+
+      .folders-panel {
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        flex: 1;
+        padding: 0 6px 10px;
+      }
+
+      .folders-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 4px 10px;
+      }
+
+      .folders-head span,
+      .header-kicker,
+      .field-label {
+        font-size: 10.5px;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.3);
+      }
+
+      .header-kicker,
+      .field-label {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.35);
+      }
+
+      .tiny-action,
+      .accent-button,
+      .subtle-button,
+      .command-button,
+      .danger-button,
+      .chip-button,
+      .settings-action,
+      .tiny-button {
+        border: 1px solid transparent;
+        border-radius: 4px;
+        transition: background 120ms ease, border-color 120ms ease, transform 120ms ease, color 120ms ease;
+      }
+
+      .tiny-action:hover,
+      .accent-button:hover,
+      .subtle-button:hover,
+      .command-button:hover,
+      .danger-button:hover,
+      .chip-button:hover,
+      .settings-action:hover,
+      .tiny-button:hover {
+        transform: translateY(-1px);
+      }
+
+      .tiny-action {
+        border-color: rgba(98, 100, 167, 0.3);
+        background: rgba(98, 100, 167, 0.15);
+        color: #8b8cc8;
+        padding: 4px 8px;
+        font-size: 11px;
+      }
+
+      .folder-scroll {
+        min-height: 0;
+        overflow: auto;
+        padding-right: 2px;
+      }
+
+      .folder-group {
+        margin-bottom: 8px;
+      }
+
+      .folder-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        width: 100%;
+        border: 0;
+        background: transparent;
+        padding: 6px 8px;
+        color: rgba(255, 255, 255, 0.72);
+        border-radius: 4px;
+        text-align: left;
+      }
+
+      .folder-row:hover {
+        background: rgba(255, 255, 255, 0.04);
+      }
+
+      .folder-row-main {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+      }
+
+      .folder-chevron {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.55);
+      }
+
+      .folder-name {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .count-badge {
+        min-width: 18px;
+        padding: 2px 7px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.68);
+        text-align: center;
+        font-size: 10.5px;
+      }
+
+      .snippet-list {
+        display: grid;
+        gap: 1px;
+        padding: 2px 6px;
+      }
+
+      .snippet-item {
+        position: relative;
+        display: grid;
+        grid-template-columns: 52px minmax(0, 1fr);
+        gap: 10px;
+        width: 100%;
+        border: 0;
+        border-radius: 4px;
+        background: transparent;
+        padding: 8px 10px;
+        color: inherit;
+        text-align: left;
+        overflow: hidden;
+      }
+
+      .snippet-item:hover {
+        background: rgba(255, 255, 255, 0.06);
+      }
+
+      .snippet-item.active {
+        background: rgba(98, 100, 167, 0.2);
+      }
+
+      .snippet-item.active::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 6px;
+        bottom: 6px;
+        width: 3px;
+        border-radius: 0 2px 2px 0;
+        background: #8b8cc8;
+      }
+
+      .snippet-shortcut {
+        min-width: 48px;
+        font-size: 12.5px;
+        color: #9496d1;
+      }
+
+      .snippet-item.active .snippet-shortcut {
+        color: #b0b2e8;
+      }
+
+      .snippet-preview {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.28);
+      }
+
+      .nav-empty {
+        padding: 12px 10px;
+        color: rgba(255, 255, 255, 0.22);
+        font-size: 11.5px;
+      }
+
+      .pane-footer {
+        margin-top: auto;
+        display: grid;
+        gap: 5px;
+        padding: 10px;
+        border-top: 1px solid rgba(255, 255, 255, 0.07);
+      }
+
+      .accent-button {
+        width: 100%;
+        background: #6264a7;
+        color: #fff;
+        padding: 9px 12px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .accent-button:hover {
+        background: #7274b8;
+      }
+
+      .accent-button:active {
+        transform: scale(0.99);
+      }
+
+      .subtle-button {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.04);
+        border-color: rgba(255, 255, 255, 0.08);
+        color: rgba(255, 255, 255, 0.6);
+        padding: 8px 12px;
+        font-size: 12px;
+      }
+
+      .content-area {
+        flex: 1;
+        min-width: 0;
+        min-height: 0;
+        overflow: auto;
+        background: #1c1c1c;
+        padding: 24px 28px;
+      }
+
+      .content-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 22px;
+      }
+
+      .header-kicker {
+        margin-bottom: 8px;
+      }
+
+      .page-title {
+        margin: 0;
+        font-family: "DM Mono", "Cascadia Code", Consolas, monospace;
+        font-size: 24px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.92);
+      }
+
+      .command-bar {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+
+      .command-button {
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.75);
+        padding: 6px 14px;
+        font-size: 12px;
+      }
+
+      .danger-button {
+        background: rgba(196, 43, 28, 0.12);
+        border-color: rgba(196, 43, 28, 0.3);
+        color: #f08070;
+        padding: 6px 14px;
+        font-size: 12px;
+      }
+
+      .field-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+
+      .field-card,
+      .body-card,
+      .preview-card,
+      .settings-dialog {
+        background: #262626;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 6px;
+      }
+
+      .field-card {
+        padding: 14px 16px;
+      }
+
+      .field-card .field-label {
+        margin-bottom: 10px;
+      }
+
+      .fluent-input,
+      .settings-input {
+        width: 100%;
+        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #b0b2e8;
+        padding: 6px 10px;
+        outline: 0;
+      }
+
+      .fluent-input {
+        font-family: "DM Mono", "Cascadia Code", Consolas, monospace;
+        font-size: 15px;
+        caret-color: #8b8cc8;
+      }
+
+      .fluent-input:focus,
+      .settings-input:focus {
+        border-color: #6264a7;
+        box-shadow: inset 0 -2px 0 0 #8b8cc8;
+      }
+
+      .placeholder-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        border-radius: 2px;
+        padding: 3px 10px;
+        font-size: 11.5px;
+        border: 1px solid rgba(255, 185, 0, 0.25);
+        background: rgba(255, 185, 0, 0.12);
+        color: #ffc240;
+      }
+
+      .placeholder-badge.found {
+        border-color: rgba(98, 100, 167, 0.35);
+        background: rgba(98, 100, 167, 0.18);
+        color: #9496d1;
+      }
+
+      .badge-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: currentColor;
+      }
+
+      .hint-text {
+        margin: 9px 0 0;
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.2);
+      }
+
+      .inline-code {
+        display: inline-block;
+        padding: 1px 5px;
+        border-radius: 3px;
+        background: rgba(255, 255, 255, 0.07);
+        font-family: "DM Mono", "Cascadia Code", Consolas, monospace;
+      }
+
+      .body-card-header,
+      .body-card-footer,
+      .preview-header,
+      .settings-header,
+      .settings-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 9px 14px;
+      }
+
+      .body-card-header,
+      .preview-header,
+      .settings-header {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      }
+
+      .body-toolbar {
+        display: flex;
+        gap: 3px;
+      }
+
+      .chip-button {
+        padding: 2px 8px;
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.08);
+        color: rgba(255, 255, 255, 0.62);
+        font-family: "DM Mono", "Cascadia Code", Consolas, monospace;
+        font-size: 11px;
+      }
+
+      .chip-button:hover {
+        background: rgba(98, 100, 167, 0.2);
+        border-color: rgba(98, 100, 167, 0.4);
+        color: #9496d1;
+      }
+
+      .body-textarea {
+        width: 100%;
+        min-height: 140px;
+        resize: none;
+        padding: 12px 14px;
+        border: 0;
+        outline: 0;
+        background: transparent;
+        color: rgba(255, 255, 255, 0.8);
+        font-family: "DM Mono", "Cascadia Code", Consolas, monospace;
+        font-size: 13px;
+        line-height: 1.65;
+        caret-color: #8b8cc8;
+      }
+
+      .body-textarea::placeholder {
+        color: rgba(255, 255, 255, 0.12);
+        font-style: italic;
+      }
+
+      .body-card-footer,
+      .settings-footer {
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .body-footnote {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.22);
+      }
+
+      .char-count {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.42);
+      }
+
+      .live-head {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .live-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #6ccb5f;
+        animation: blink 2s infinite;
+      }
+
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+
+        50% {
+          opacity: 0.3;
+        }
+      }
+
+      .preview-body {
+        min-height: 110px;
+        padding: 12px 14px;
+        color: rgba(255, 255, 255, 0.2);
+        font-family: "DM Mono", "Cascadia Code", Consolas, monospace;
+        font-size: 12.5px;
+        line-height: 1.65;
+        white-space: pre-wrap;
+        word-break: break-word;
+        font-style: italic;
+      }
+
+      .preview-body.live {
+        color: #b0b2e8;
+        font-style: normal;
+      }
+
+      .settings-overlay {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(10px);
+        z-index: 40;
+      }
+
+      .settings-overlay.hidden,
+      .toast.hidden {
+        display: none;
+      }
+
+      .settings-dialog {
+        width: min(680px, calc(100vw - 40px));
+        max-height: calc(100vh - 60px);
+        overflow: auto;
+      }
+
+      .settings-body {
+        display: grid;
+        gap: 16px;
+        padding: 16px 18px;
+      }
+
+      .settings-title strong {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 15px;
+        color: rgba(255, 255, 255, 0.92);
+      }
+
+      .settings-title span {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.3);
+      }
+
+      .settings-section {
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 6px;
+        padding: 14px;
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      .settings-section h3 {
+        margin: 0 0 12px;
+        font-size: 12px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.35);
+      }
+
+      .settings-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 8px 0;
+      }
+
+      .settings-row + .settings-row {
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .settings-copy strong {
+        display: block;
+        margin-bottom: 3px;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.84);
+      }
+
+      .settings-copy span {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.24);
+      }
+
+      .settings-radio-group {
+        display: grid;
+        gap: 8px;
+      }
+
+      .settings-radio {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: rgba(255, 255, 255, 0.75);
+        font-size: 12px;
+      }
+
+      .settings-radio input {
+        accent-color: #8b8cc8;
+      }
+
+      .toggle {
+        position: relative;
+        width: 46px;
+        height: 24px;
+      }
+
+      .toggle input {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+      }
+
+      .toggle-track {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.1);
+        transition: background 120ms ease;
+      }
+
+      .toggle-track::after {
+        content: "";
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        transition: transform 120ms ease;
+      }
+
+      .toggle input:checked + .toggle-track {
+        background: #6264a7;
+      }
+
+      .toggle input:checked + .toggle-track::after {
+        transform: translateX(22px);
+      }
+
+      .settings-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .settings-action,
+      .tiny-button {
+        padding: 6px 10px;
+        font-size: 12px;
+      }
+
+      .settings-action {
+        background: rgba(98, 100, 167, 0.15);
+        border-color: rgba(98, 100, 167, 0.3);
+        color: #8b8cc8;
+      }
+
+      .tiny-button {
+        background: rgba(255, 255, 255, 0.04);
+        border-color: rgba(255, 255, 255, 0.08);
+        color: rgba(255, 255, 255, 0.62);
+      }
+
+      .allowed-apps {
+        display: grid;
+        gap: 8px;
+        margin-top: 10px;
+      }
+
+      .allowed-app {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        gap: 10px;
+        align-items: center;
+        padding: 8px 10px;
+        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+      }
+
+      .app-avatar {
+        display: grid;
+        place-items: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        background: rgba(98, 100, 167, 0.18);
+        color: #8b8cc8;
+        overflow: hidden;
+      }
+
+      .app-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .app-meta {
+        min-width: 0;
+      }
+
+      .app-meta strong,
+      .app-meta span {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .app-meta strong {
+        margin-bottom: 2px;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.82);
+      }
+
+      .app-meta span {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.3);
+      }
+
+      .toast {
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+        max-width: 320px;
+        padding: 10px 12px;
+        border-radius: 6px;
+        background: rgba(20, 20, 20, 0.94);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.78);
+        z-index: 50;
+      }
+
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 3px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      @media (max-width: 1080px) {
+        .field-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
   </head>
   <body>
-    <div class="app-shell">
-      <aside class="sidebar">
-        <div class="brand-block">
-          <div class="brand-mark">S</div>
-          <div>
-            <p class="eyebrow">Windows Text Expander</p>
-            <h1>SnapType</h1>
+    <div class="window-shell">
+      <header class="titlebar">
+        <div class="titlebar-left">
+          <div class="titlebar-icon">S</div>
+          <div class="titlebar-text">SnapType — Windows Text Expander</div>
+        </div>
+        <div class="window-controls">
+          <button id="minimizeWindow" class="window-control" type="button" aria-label="Minimize">─</button>
+          <button id="toggleMaximizeWindow" class="window-control" type="button" aria-label="Maximize">□</button>
+          <button id="hideWindow" class="window-control close" type="button" aria-label="Close">✕</button>
+        </div>
+      </header>
+
+      <div class="layout">
+        <aside class="nav-pane">
+          <div class="brand-header">
+            <div class="brand-icon">ST</div>
+            <div class="brand-copy">
+              <strong>SnapType</strong>
+              <span>Text Expander</span>
+            </div>
           </div>
-        </div>
 
-        <label class="search-wrap">
-          <span>Search snippets</span>
-          <input id="searchInput" type="search" placeholder="Find shortcut or text" />
-        </label>
+          <div class="search-block">
+            <label class="search-box">
+              <svg viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M11.38 10.32 14.8 13.73l-1.06 1.06-3.41-3.42a5.5 5.5 0 1 1 1.05-1.05ZM6.5 10.5a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"></path>
+              </svg>
+              <input id="searchInput" type="search" placeholder="Find shortcut or text…" />
+            </label>
+          </div>
 
-        <div class="sidebar-section-head">
-          <span>Folders</span>
-          <button id="newFolderButton" class="mini-button" type="button">+ Folder</button>
-        </div>
+          <div class="folders-panel">
+            <div class="folders-head">
+              <span>Folders</span>
+              <button id="newFolderButton" class="tiny-action" type="button">+ Folder</button>
+            </div>
+            <div class="folder-scroll">
+              <div id="folderList"></div>
+            </div>
+          </div>
 
-        <div id="folderList" class="folder-list"></div>
+          <div class="pane-footer">
+            <button id="newSnippetButton" class="accent-button" type="button">＋ New Snippet</button>
+            <button id="settingsButton" class="subtle-button" type="button">⚙ Settings</button>
+          </div>
+        </aside>
 
-        <div class="sidebar-footer">
-          <button id="newSnippetButton" class="primary-button" type="button">New Snippet</button>
-          <button id="settingsButton" class="link-button" type="button">Settings</button>
-        </div>
-      </aside>
+        <main class="content-area">
+          <div class="content-header">
+            <div>
+              <div class="header-kicker">Snippet Editor</div>
+              <h1 id="pageTitle" class="page-title mono">/new</h1>
+            </div>
+            <div class="command-bar">
+              <button id="folderPill" class="command-button" type="button">General</button>
+              <button id="deleteSnippetButton" class="danger-button" type="button">🗑 Delete Snippet</button>
+            </div>
+          </div>
 
-      <main class="content-panel">
-        <div id="viewRoot" class="view-root"></div>
-      </main>
+          <section class="field-grid">
+            <article class="field-card">
+              <div class="field-label">Shortcut</div>
+              <input id="shortcutInput" class="fluent-input" type="text" spellcheck="false" autocomplete="off" />
+            </article>
+
+            <article class="field-card">
+              <div class="field-label">Placeholder Scan</div>
+              <div id="placeholderBadge" class="placeholder-badge empty">
+                <span class="badge-dot"></span>
+                <span id="placeholderText">0 placeholders detected</span>
+              </div>
+              <p class="hint-text">Patterns like <span class="inline-code">{{name}}</span> open a popup before insertion.</p>
+            </article>
+          </section>
+
+          <section class="body-card">
+            <div class="body-card-header">
+              <div class="field-label">Snippet Body</div>
+              <div class="body-toolbar">
+                <button id="insertPlaceholderButton" class="chip-button" type="button">{{ph}}</button>
+                <button id="insertNewlineButton" class="chip-button" type="button">↵</button>
+                <button id="insertTabButton" class="chip-button" type="button">↹</button>
+              </div>
+            </div>
+            <textarea id="bodyInput" class="body-textarea" spellcheck="false" placeholder="Type your snippet text here…"></textarea>
+            <div class="body-card-footer">
+              <div class="body-footnote">SnapType erases the shortcut, then types this text into the active window.</div>
+              <div id="charCount" class="char-count mono">0 chars</div>
+            </div>
+          </section>
+
+          <section class="preview-card">
+            <div class="preview-header">
+              <div class="live-head">
+                <span class="live-dot"></span>
+                <span class="field-label">Live Preview</span>
+              </div>
+            </div>
+            <div id="livePreview" class="preview-body">Your snippet preview will appear here.</div>
+          </section>
+        </main>
+      </div>
     </div>
 
-    <div id="countdownOverlay" class="countdown-overlay hidden">
-      <div class="countdown-card">
-        <p class="eyebrow">Pick Active Window</p>
-        <h2 id="countdownValue">3</h2>
-        <p>Switch to your target app now.</p>
+    <div id="settingsOverlay" class="settings-overlay hidden">
+      <div class="settings-dialog">
+        <div class="settings-header">
+          <div class="settings-title">
+            <strong>Settings</strong>
+            <span>Keep SnapType ready across Windows and control where snippets expand.</span>
+          </div>
+          <button id="closeSettingsButton" class="tiny-button" type="button">Close</button>
+        </div>
+        <div class="settings-body">
+          <section class="settings-section">
+            <h3>General</h3>
+            <div class="settings-row">
+              <div class="settings-copy">
+                <strong>Launch at Windows startup</strong>
+                <span>Start SnapType in the tray when you sign in.</span>
+              </div>
+              <label class="toggle">
+                <input id="launchToggle" type="checkbox" />
+                <span class="toggle-track"></span>
+              </label>
+            </div>
+            <div class="settings-row">
+              <div class="settings-copy">
+                <strong>Trigger character prefix</strong>
+                <span>Used as the default prefix for newly created snippets.</span>
+              </div>
+              <input id="triggerInput" class="settings-input mono" type="text" maxlength="1" />
+            </div>
+          </section>
+
+          <section class="settings-section">
+            <h3>Active In</h3>
+            <div class="settings-radio-group">
+              <label class="settings-radio">
+                <input id="modeGlobal" name="activeMode" type="radio" value="global" />
+                <span>All Apps</span>
+              </label>
+              <label class="settings-radio">
+                <input id="modeAllowlist" name="activeMode" type="radio" value="allowlist" />
+                <span>Only these apps</span>
+              </label>
+            </div>
+            <div id="allowlistTools" style="margin-top: 12px;">
+              <div class="settings-actions">
+                <button id="addAppButton" class="settings-action" type="button">Add App</button>
+                <button id="pickActiveButton" class="settings-action" type="button">Pick Active Window</button>
+              </div>
+              <div id="allowedApps" class="allowed-apps"></div>
+            </div>
+          </section>
+        </div>
+        <div class="settings-footer">
+          <div class="body-footnote">Global shortcut: Ctrl+Shift+Space</div>
+          <button id="doneSettingsButton" class="accent-button" type="button">Done</button>
+        </div>
       </div>
     </div>
 
     <div id="toast" class="toast hidden" aria-live="polite"></div>
 
-    <script src="./index.js"></script>
+    <script>
+      const fallbackPayload = {
+        state: {
+          folders: [
+            {
+              id: "folder_general",
+              name: "General",
+              snippets: [
+                { id: "snip_new", shortcut: "/new", body: "" },
+                { id: "snip_name", shortcut: "/nme", body: "Ankit Kumar Singh" },
+                { id: "snip_thanks", shortcut: "/ty", body: "thank you" }
+              ]
+            }
+          ],
+          settings: {
+            launchOnStartup: false,
+            triggerChar: "/",
+            activeIn: {
+              mode: "global",
+              apps: []
+            }
+          }
+        },
+        meta: {
+          version: "1.0.0",
+          toggleShortcut: "Ctrl+Shift+Space"
+        }
+      };
+
+      const bridge = window.snaptype || null;
+      const uiState = {
+        data: null,
+        meta: fallbackPayload.meta,
+        selectedFolderId: null,
+        selectedSnippetId: null,
+        collapsedFolders: {},
+        searchTerm: "",
+        editorDraft: null,
+        saveTimer: null,
+        settingsTimer: null,
+        toastTimer: null
+      };
+
+      const elements = {
+        folderList: document.querySelector("#folderList"),
+        searchInput: document.querySelector("#searchInput"),
+        newFolderButton: document.querySelector("#newFolderButton"),
+        newSnippetButton: document.querySelector("#newSnippetButton"),
+        settingsButton: document.querySelector("#settingsButton"),
+        pageTitle: document.querySelector("#pageTitle"),
+        folderPill: document.querySelector("#folderPill"),
+        shortcutInput: document.querySelector("#shortcutInput"),
+        bodyInput: document.querySelector("#bodyInput"),
+        placeholderBadge: document.querySelector("#placeholderBadge"),
+        placeholderText: document.querySelector("#placeholderText"),
+        charCount: document.querySelector("#charCount"),
+        livePreview: document.querySelector("#livePreview"),
+        deleteSnippetButton: document.querySelector("#deleteSnippetButton"),
+        insertPlaceholderButton: document.querySelector("#insertPlaceholderButton"),
+        insertNewlineButton: document.querySelector("#insertNewlineButton"),
+        insertTabButton: document.querySelector("#insertTabButton"),
+        minimizeWindow: document.querySelector("#minimizeWindow"),
+        toggleMaximizeWindow: document.querySelector("#toggleMaximizeWindow"),
+        hideWindow: document.querySelector("#hideWindow"),
+        settingsOverlay: document.querySelector("#settingsOverlay"),
+        closeSettingsButton: document.querySelector("#closeSettingsButton"),
+        doneSettingsButton: document.querySelector("#doneSettingsButton"),
+        launchToggle: document.querySelector("#launchToggle"),
+        triggerInput: document.querySelector("#triggerInput"),
+        modeGlobal: document.querySelector("#modeGlobal"),
+        modeAllowlist: document.querySelector("#modeAllowlist"),
+        allowlistTools: document.querySelector("#allowlistTools"),
+        addAppButton: document.querySelector("#addAppButton"),
+        pickActiveButton: document.querySelector("#pickActiveButton"),
+        allowedApps: document.querySelector("#allowedApps"),
+        toast: document.querySelector("#toast")
+      };
+
+      function clone(value) {
+        return JSON.parse(JSON.stringify(value));
+      }
+
+      function escapeHtml(value) {
+        return String(value)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#39;");
+      }
+
+      function sleep(milliseconds) {
+        return new Promise((resolve) => {
+          window.setTimeout(resolve, milliseconds);
+        });
+      }
+
+      function normalizeSearch(value) {
+        return String(value || "").trim().toLowerCase();
+      }
+
+      function isEditorActive() {
+        return document.activeElement === elements.shortcutInput || document.activeElement === elements.bodyInput;
+      }
+
+      function filePathToUrl(filePath) {
+        if (!filePath) {
+          return "";
+        }
+
+        return encodeURI(`file:///${filePath.replace(/\\/g, "/")}`);
+      }
+
+      function getPlaceholderMatches(value) {
+        return value.match(/\{\{[^}]+\}\}/g) || [];
+      }
+
+      function getFolders() {
+        return uiState.data?.folders || [];
+      }
+
+      function getSelectedSnippetInfo() {
+        for (const folder of getFolders()) {
+          const snippet = folder.snippets.find((item) => item.id === uiState.selectedSnippetId);
+
+          if (snippet) {
+            return { folder, snippet };
+          }
+        }
+
+        return null;
+      }
+
+      function ensureSelection() {
+        const folders = getFolders();
+
+        if (!uiState.selectedFolderId && folders[0]) {
+          uiState.selectedFolderId = folders[0].id;
+        }
+
+        const current = getSelectedSnippetInfo();
+
+        if (current) {
+          uiState.selectedFolderId = current.folder.id;
+          if (!uiState.editorDraft || uiState.editorDraft.id !== current.snippet.id) {
+            uiState.editorDraft = clone(current.snippet);
+          }
+          return;
+        }
+
+        for (const folder of folders) {
+          if (folder.snippets.length > 0) {
+            uiState.selectedFolderId = folder.id;
+            uiState.selectedSnippetId = folder.snippets[0].id;
+            uiState.editorDraft = clone(folder.snippets[0]);
+            return;
+          }
+        }
+
+        uiState.selectedSnippetId = null;
+        uiState.editorDraft = { id: "", shortcut: "/new", body: "" };
+      }
+
+      function derivePreview(body) {
+        if (!body || !body.trim()) {
+          return "Empty snippet";
+        }
+
+        return body.replace(/\s+/g, " ").trim();
+      }
+
+      function showToast(message) {
+        clearTimeout(uiState.toastTimer);
+        elements.toast.textContent = message;
+        elements.toast.classList.remove("hidden");
+        uiState.toastTimer = window.setTimeout(() => {
+          elements.toast.classList.add("hidden");
+        }, 2400);
+      }
+
+      function getFilteredFolders() {
+        const search = normalizeSearch(uiState.searchTerm);
+
+        if (!search) {
+          return getFolders();
+        }
+
+        return getFolders()
+          .map((folder) => {
+            const folderMatches = normalizeSearch(folder.name).includes(search);
+            const snippets = folder.snippets.filter((snippet) => {
+              if (folderMatches) {
+                return true;
+              }
+
+              return normalizeSearch(`${snippet.shortcut} ${snippet.body}`).includes(search);
+            });
+
+            return { ...folder, snippets };
+          })
+          .filter((folder) => folder.snippets.length > 0 || normalizeSearch(folder.name).includes(search));
+      }
+
+      function renderNavigation() {
+        const folders = getFilteredFolders();
+
+        if (folders.length === 0) {
+          elements.folderList.innerHTML = '<div class="nav-empty">No snippets match that search.</div>';
+          return;
+        }
+
+        elements.folderList.innerHTML = folders
+          .map((folder) => {
+            const collapsed = Boolean(uiState.collapsedFolders[folder.id]);
+
+            return `
+              <section class="folder-group">
+                <button class="folder-row" data-folder-toggle="${folder.id}" type="button">
+                  <span class="folder-row-main">
+                    <span class="folder-chevron">${collapsed ? "▶" : "▼"}</span>
+                    <span class="folder-name">${escapeHtml(folder.name)}</span>
+                  </span>
+                  <span class="count-badge">${folder.snippets.length}</span>
+                </button>
+                ${
+                  collapsed
+                    ? ""
+                    : `<div class="snippet-list">
+                        ${
+                          folder.snippets.length > 0
+                            ? folder.snippets
+                                .map((snippet) => {
+                                  const preview = derivePreview(snippet.body);
+                                  const active = snippet.id === uiState.selectedSnippetId ? "active" : "";
+
+                                  return `
+                                    <button
+                                      class="snippet-item ${active}"
+                                      data-snippet-id="${snippet.id}"
+                                      data-folder-id="${folder.id}"
+                                      data-shortcut="${escapeHtml(snippet.shortcut)}"
+                                      data-preview="${escapeHtml(preview)}"
+                                      data-body="${escapeHtml(snippet.body)}"
+                                      type="button"
+                                    >
+                                      <span class="snippet-shortcut mono">${escapeHtml(snippet.shortcut)}</span>
+                                      <span class="snippet-preview">${escapeHtml(preview)}</span>
+                                    </button>
+                                  `;
+                                })
+                                .join("")
+                            : '<div class="nav-empty">No snippets here yet.</div>'
+                        }
+                      </div>`
+                }
+              </section>
+            `;
+          })
+          .join("");
+      }
+
+      function onShortcut(value) {
+        elements.pageTitle.textContent = value && value.trim() ? value : "/new";
+      }
+
+      function onBody(value) {
+        const nextValue = String(value || "");
+        const matches = getPlaceholderMatches(nextValue);
+        elements.charCount.textContent = `${nextValue.length} chars`;
+
+        if (nextValue.trim()) {
+          elements.livePreview.classList.add("live");
+          elements.livePreview.textContent = nextValue;
+        } else {
+          elements.livePreview.classList.remove("live");
+          elements.livePreview.textContent = "Your snippet preview will appear here.";
+        }
+
+        if (matches.length === 0) {
+          elements.placeholderBadge.classList.remove("found");
+          elements.placeholderText.textContent = "0 placeholders detected";
+        } else {
+          elements.placeholderBadge.classList.add("found");
+          elements.placeholderText.textContent = `${matches.length} placeholder${matches.length === 1 ? "" : "s"} found`;
+        }
+      }
+
+      function syncEditor() {
+        const current = getSelectedSnippetInfo();
+        const folderName = current?.folder?.name || "General";
+        const draft = uiState.editorDraft || { shortcut: "/new", body: "" };
+        elements.folderPill.textContent = folderName;
+        elements.shortcutInput.value = draft.shortcut || "";
+        elements.bodyInput.value = draft.body || "";
+        onShortcut(draft.shortcut || "/new");
+        onBody(draft.body || "");
+      }
+
+      function syncEditorChrome() {
+        const current = getSelectedSnippetInfo();
+        const folderName = current?.folder?.name || "General";
+        const draft = uiState.editorDraft || { shortcut: "/new", body: "" };
+        elements.folderPill.textContent = folderName;
+        onShortcut(draft.shortcut || "/new");
+        onBody(draft.body || "");
+      }
+
+      function renderSettings() {
+        const settings = uiState.data?.settings || fallbackPayload.state.settings;
+        elements.launchToggle.checked = Boolean(settings.launchOnStartup);
+        elements.triggerInput.value = settings.triggerChar || "/";
+        elements.modeGlobal.checked = settings.activeIn.mode === "global";
+        elements.modeAllowlist.checked = settings.activeIn.mode === "allowlist";
+        elements.allowlistTools.style.display = settings.activeIn.mode === "allowlist" ? "block" : "none";
+
+        const apps = settings.activeIn.apps || [];
+
+        if (apps.length === 0) {
+          elements.allowedApps.innerHTML = '<div class="nav-empty">No allowlisted apps yet.</div>';
+          return;
+        }
+
+        elements.allowedApps.innerHTML = apps
+          .map((appInfo) => {
+            const icon = filePathToUrl(appInfo.icon);
+            const initial = (appInfo.name || "?").slice(0, 1).toUpperCase();
+
+            return `
+              <div class="allowed-app">
+                <div class="app-avatar">
+                  ${
+                    icon
+                      ? `<img src="${icon}" alt="${escapeHtml(appInfo.name)} icon" />`
+                      : `<span>${escapeHtml(initial)}</span>`
+                  }
+                </div>
+                <div class="app-meta">
+                  <strong>${escapeHtml(appInfo.name)}</strong>
+                  <span>${escapeHtml(appInfo.exe || appInfo.path || "")}</span>
+                </div>
+                <button class="tiny-button" data-remove-app="${escapeHtml(appInfo.path || appInfo.exe)}" type="button">Remove</button>
+              </div>
+            `;
+          })
+          .join("");
+      }
+
+      function hydrate(payload, options = {}) {
+        const preserveDraft = Boolean(options.preserveDraft);
+        uiState.data = clone(payload.state);
+        uiState.meta = payload.meta || uiState.meta;
+        ensureSelection();
+
+        if (!preserveDraft) {
+          const current = getSelectedSnippetInfo();
+          uiState.editorDraft = current ? clone(current.snippet) : { id: "", shortcut: "/new", body: "" };
+        }
+
+        renderNavigation();
+
+        if (preserveDraft) {
+          syncEditorChrome();
+        } else {
+          syncEditor();
+        }
+
+        renderSettings();
+      }
+
+      function pick(el, shortcut, preview, body) {
+        document.querySelectorAll(".snippet-item.active").forEach((item) => item.classList.remove("active"));
+        if (el) {
+          el.classList.add("active");
+          uiState.selectedFolderId = el.dataset.folderId;
+          uiState.selectedSnippetId = el.dataset.snippetId;
+        }
+
+        const current = getSelectedSnippetInfo();
+        uiState.editorDraft = current ? clone(current.snippet) : { id: "", shortcut, body };
+        syncEditor();
+      }
+
+      function patchLocalSnippet(id, patch) {
+        for (const folder of getFolders()) {
+          const snippet = folder.snippets.find((item) => item.id === id);
+
+          if (snippet) {
+            Object.assign(snippet, patch);
+            break;
+          }
+        }
+      }
+
+      function updateSelectedNavText() {
+        const selectedItem = document.querySelector(`.snippet-item[data-snippet-id="${uiState.selectedSnippetId}"]`);
+
+        if (!selectedItem || !uiState.editorDraft) {
+          return;
+        }
+
+        const shortcutEl = selectedItem.querySelector(".snippet-shortcut");
+        const previewEl = selectedItem.querySelector(".snippet-preview");
+
+        if (shortcutEl) {
+          shortcutEl.textContent = uiState.editorDraft.shortcut || "/new";
+        }
+
+        if (previewEl) {
+          previewEl.textContent = derivePreview(uiState.editorDraft.body);
+        }
+      }
+
+      async function queueSaveSnippet() {
+        clearTimeout(uiState.saveTimer);
+
+        uiState.saveTimer = window.setTimeout(async () => {
+          const draft = uiState.editorDraft;
+
+          if (!draft || !draft.id) {
+            return;
+          }
+
+          const patch = {
+            shortcut: draft.shortcut.trim() || "/new",
+            body: draft.body
+          };
+
+          if (!bridge) {
+            patchLocalSnippet(draft.id, patch);
+            renderNavigation();
+            return;
+          }
+
+          const result = await bridge.updateSnippet(draft.id, patch);
+
+          if (!result.ok) {
+            showToast(result.error || "Unable to save snippet.");
+            return;
+          }
+
+          hydrate(result, { preserveDraft: true });
+        }, 180);
+      }
+
+      function insertTextAtCursor(text) {
+        const start = elements.bodyInput.selectionStart;
+        const end = elements.bodyInput.selectionEnd;
+        const currentValue = elements.bodyInput.value;
+        const nextValue = `${currentValue.slice(0, start)}${text}${currentValue.slice(end)}`;
+        elements.bodyInput.value = nextValue;
+        elements.bodyInput.focus();
+        const nextCursor = start + text.length;
+        elements.bodyInput.setSelectionRange(nextCursor, nextCursor);
+        uiState.editorDraft.body = nextValue;
+        onBody(nextValue);
+        updateSelectedNavText();
+        queueSaveSnippet();
+      }
+
+      function insertPH() {
+        insertTextAtCursor("{{name}}");
+      }
+
+      function openSettings() {
+        renderSettings();
+        elements.settingsOverlay.classList.remove("hidden");
+      }
+
+      function closeSettings() {
+        elements.settingsOverlay.classList.add("hidden");
+      }
+
+      async function updateSettings(patch) {
+        if (!bridge) {
+          uiState.data.settings = {
+            ...uiState.data.settings,
+            ...patch,
+            activeIn: {
+              ...uiState.data.settings.activeIn,
+              ...(patch.activeIn || {})
+            }
+          };
+          renderSettings();
+          return;
+        }
+
+        const result = await bridge.updateSettings(patch);
+
+        if (!result.ok) {
+          showToast(result.error || "Unable to update settings.");
+          return;
+        }
+
+        hydrate(result, { preserveDraft: true });
+      }
+
+      async function createFolder() {
+        const name = window.prompt("Folder name", "General");
+
+        if (!name) {
+          return;
+        }
+
+        if (!bridge) {
+          const id = `folder_${Date.now()}`;
+          uiState.data.folders.push({ id, name, snippets: [] });
+          uiState.selectedFolderId = id;
+          renderNavigation();
+          return;
+        }
+
+        const result = await bridge.createFolder(name);
+
+        if (!result.ok) {
+          showToast(result.error || "Unable to create folder.");
+          return;
+        }
+
+        hydrate(result, { preserveDraft: true });
+      }
+
+      async function createSnippet() {
+        const targetFolderId = uiState.selectedFolderId || getFolders()[0]?.id;
+
+        if (!bridge) {
+          const folder = getFolders().find((item) => item.id === targetFolderId) || getFolders()[0];
+
+          if (!folder) {
+            return;
+          }
+
+          const snippet = {
+            id: `snip_${Date.now()}`,
+            shortcut: `${uiState.data.settings.triggerChar || "/"}new`,
+            body: ""
+          };
+          folder.snippets.unshift(snippet);
+          uiState.selectedFolderId = folder.id;
+          uiState.selectedSnippetId = snippet.id;
+          uiState.editorDraft = clone(snippet);
+          renderNavigation();
+          syncEditor();
+          return;
+        }
+
+        const result = await bridge.createSnippet(targetFolderId);
+
+        if (!result.ok) {
+          showToast(result.error || "Unable to create snippet.");
+          return;
+        }
+
+        uiState.selectedSnippetId = result.snippet.id;
+        hydrate(result);
+      }
+
+      async function deleteSelectedSnippet() {
+        const current = getSelectedSnippetInfo();
+
+        if (!current) {
+          return;
+        }
+
+        if (!window.confirm("Delete this snippet?")) {
+          return;
+        }
+
+        if (!bridge) {
+          current.folder.snippets = current.folder.snippets.filter((snippet) => snippet.id !== current.snippet.id);
+          uiState.selectedSnippetId = null;
+          ensureSelection();
+          renderNavigation();
+          syncEditor();
+          return;
+        }
+
+        const result = await bridge.deleteSnippet(current.snippet.id);
+
+        if (!result.ok) {
+          showToast(result.error || "Unable to delete snippet.");
+          return;
+        }
+
+        hydrate(result);
+      }
+
+      function bindWindowControls() {
+        elements.minimizeWindow.addEventListener("click", async () => {
+          if (bridge?.windowControls?.minimize) {
+            await bridge.windowControls.minimize();
+          }
+        });
+
+        elements.toggleMaximizeWindow.addEventListener("click", async () => {
+          if (bridge?.windowControls?.toggleMaximize) {
+            await bridge.windowControls.toggleMaximize();
+          }
+        });
+
+        elements.hideWindow.addEventListener("click", async () => {
+          if (bridge?.windowControls?.hide) {
+            await bridge.windowControls.hide();
+            return;
+          }
+
+          window.close();
+        });
+      }
+
+      function bindNavigation() {
+        elements.folderList.addEventListener("click", (event) => {
+          const folderToggle = event.target.closest("[data-folder-toggle]");
+
+          if (folderToggle) {
+            const folderId = folderToggle.dataset.folderToggle;
+            uiState.collapsedFolders[folderId] = !uiState.collapsedFolders[folderId];
+            renderNavigation();
+            return;
+          }
+
+          const snippetButton = event.target.closest("[data-snippet-id]");
+
+          if (snippetButton) {
+            pick(snippetButton, snippetButton.dataset.shortcut, snippetButton.dataset.preview, snippetButton.dataset.body);
+          }
+        });
+      }
+
+      function bindEditor() {
+        elements.shortcutInput.addEventListener("input", () => {
+          if (!uiState.editorDraft) {
+            return;
+          }
+
+          uiState.editorDraft.shortcut = elements.shortcutInput.value;
+          onShortcut(elements.shortcutInput.value);
+          updateSelectedNavText();
+          queueSaveSnippet();
+        });
+
+        elements.bodyInput.addEventListener("input", () => {
+          if (!uiState.editorDraft) {
+            return;
+          }
+
+          uiState.editorDraft.body = elements.bodyInput.value;
+          onBody(elements.bodyInput.value);
+          updateSelectedNavText();
+          queueSaveSnippet();
+        });
+
+        elements.insertPlaceholderButton.addEventListener("click", () => {
+          insertPH();
+        });
+
+        elements.insertNewlineButton.addEventListener("click", () => {
+          insertTextAtCursor("\n");
+        });
+
+        elements.insertTabButton.addEventListener("click", () => {
+          insertTextAtCursor("\t");
+        });
+
+        elements.deleteSnippetButton.addEventListener("click", () => {
+          void deleteSelectedSnippet();
+        });
+      }
+
+      function bindSettings() {
+        elements.settingsButton.addEventListener("click", openSettings);
+        elements.closeSettingsButton.addEventListener("click", closeSettings);
+        elements.doneSettingsButton.addEventListener("click", closeSettings);
+
+        elements.settingsOverlay.addEventListener("click", (event) => {
+          if (event.target === elements.settingsOverlay) {
+            closeSettings();
+          }
+        });
+
+        elements.launchToggle.addEventListener("change", () => {
+          void updateSettings({ launchOnStartup: elements.launchToggle.checked });
+        });
+
+        elements.triggerInput.addEventListener("input", () => {
+          clearTimeout(uiState.settingsTimer);
+          uiState.settingsTimer = window.setTimeout(() => {
+            void updateSettings({ triggerChar: elements.triggerInput.value || "/" });
+          }, 180);
+        });
+
+        document.querySelectorAll('input[name="activeMode"]').forEach((radio) => {
+          radio.addEventListener("change", () => {
+            void updateSettings({
+              activeIn: {
+                mode: radio.value
+              }
+            });
+          });
+        });
+
+        elements.addAppButton.addEventListener("click", async () => {
+          if (!bridge?.chooseAllowedApp) {
+            showToast("Available inside the packaged Electron app.");
+            return;
+          }
+
+          const result = await bridge.chooseAllowedApp();
+
+          if (!result.ok) {
+            showToast(result.error || "Unable to add app.");
+            return;
+          }
+
+          if (!result.canceled) {
+            hydrate(result, { preserveDraft: true });
+          }
+        });
+
+        elements.pickActiveButton.addEventListener("click", async () => {
+          if (!bridge?.pickActiveApp) {
+            showToast("Available inside the packaged Electron app.");
+            return;
+          }
+
+          showToast("Switch to your target app now.");
+          await sleep(1200);
+          const result = await bridge.pickActiveApp();
+
+          if (!result.ok) {
+            showToast(result.error || "Unable to capture active app.");
+            return;
+          }
+
+          hydrate(result, { preserveDraft: true });
+        });
+
+        elements.allowedApps.addEventListener("click", async (event) => {
+          const removeButton = event.target.closest("[data-remove-app]");
+
+          if (!removeButton || !bridge?.removeAllowedApp) {
+            return;
+          }
+
+          const result = await bridge.removeAllowedApp(removeButton.dataset.removeApp);
+
+          if (!result.ok) {
+            showToast(result.error || "Unable to remove app.");
+            return;
+          }
+
+          hydrate(result, { preserveDraft: true });
+        });
+      }
+
+      async function loadInitialState() {
+        if (!bridge?.getState) {
+          return clone(fallbackPayload);
+        }
+
+        let lastError = null;
+
+        for (let attempt = 0; attempt < 8; attempt += 1) {
+          try {
+            return await bridge.getState();
+          } catch (error) {
+            lastError = error;
+            await sleep(100);
+          }
+        }
+
+        throw lastError || new Error("Unable to load SnapType state.");
+      }
+
+      async function init() {
+        bindWindowControls();
+        bindNavigation();
+        bindEditor();
+        bindSettings();
+
+        elements.searchInput.addEventListener("input", () => {
+          uiState.searchTerm = elements.searchInput.value;
+          renderNavigation();
+        });
+
+        elements.newFolderButton.addEventListener("click", () => {
+          void createFolder();
+        });
+
+        elements.newSnippetButton.addEventListener("click", () => {
+          void createSnippet();
+        });
+
+        if (bridge?.onStateChanged) {
+          bridge.onStateChanged((payload) => {
+            hydrate(payload, { preserveDraft: isEditorActive() });
+          });
+        }
+
+        const payload = await loadInitialState();
+        hydrate(payload);
+      }
+
+      window.addEventListener("beforeunload", () => {
+        clearTimeout(uiState.saveTimer);
+        clearTimeout(uiState.settingsTimer);
+        clearTimeout(uiState.toastTimer);
+      });
+
+      void init();
+    </script>
   </body>
 </html>

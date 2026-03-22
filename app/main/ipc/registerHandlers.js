@@ -1,4 +1,4 @@
-const { dialog, ipcMain } = require('electron');
+const { BrowserWindow, dialog, ipcMain } = require('electron');
 const path = require('node:path');
 
 function removeHandler(channel) {
@@ -36,7 +36,10 @@ function registerIpcHandlers(context) {
     'allowed-app:pick-active',
     'allowed-app:remove',
     'popup:submit',
-    'popup:cancel'
+    'popup:cancel',
+    'window:minimize',
+    'window:toggle-maximize',
+    'window:hide'
   ];
 
   channels.forEach(removeHandler);
@@ -197,6 +200,30 @@ function registerIpcHandlers(context) {
   ipcMain.handle('popup:cancel', async () => {
     windows.hidePopup();
     finishExpansion();
+    return { ok: true };
+  });
+
+  ipcMain.handle('window:minimize', async (event) => {
+    BrowserWindow.fromWebContents(event.sender)?.minimize();
+    return { ok: true };
+  });
+
+  ipcMain.handle('window:toggle-maximize', async (event) => {
+    const window = BrowserWindow.fromWebContents(event.sender);
+
+    if (window) {
+      if (window.isMaximized()) {
+        window.unmaximize();
+      } else {
+        window.maximize();
+      }
+    }
+
+    return { ok: true };
+  });
+
+  ipcMain.handle('window:hide', async (event) => {
+    BrowserWindow.fromWebContents(event.sender)?.hide();
     return { ok: true };
   });
 }

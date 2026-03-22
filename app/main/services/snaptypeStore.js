@@ -11,9 +11,19 @@ const DEFAULT_STATE = {
       name: 'General',
       snippets: [
         {
+          id: 'snip_new',
+          shortcut: '/new',
+          body: ''
+        },
+        {
+          id: 'snip_name',
+          shortcut: '/nme',
+          body: 'Ankit Kumar Singh'
+        },
+        {
           id: 'snip_thanks',
           shortcut: '/ty',
-          body: 'Thank you for your message.'
+          body: 'thank you'
         }
       ]
     }

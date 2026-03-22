@@ -24,5 +24,10 @@ contextBridge.exposeInMainWorld('snaptype', {
   onStateChanged: (callback) => createListener('state:changed', callback),
   onPopupOpen: (callback) => createListener('popup:open', callback),
   submitPopup: (values) => ipcRenderer.invoke('popup:submit', values),
-  cancelPopup: () => ipcRenderer.invoke('popup:cancel')
+  cancelPopup: () => ipcRenderer.invoke('popup:cancel'),
+  windowControls: {
+    minimize: () => ipcRenderer.invoke('window:minimize'),
+    toggleMaximize: () => ipcRenderer.invoke('window:toggle-maximize'),
+    hide: () => ipcRenderer.invoke('window:hide')
+  }
 });
