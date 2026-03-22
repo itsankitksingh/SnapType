@@ -143,7 +143,7 @@ function registerIpcHandlers(context) {
         windowInfo: {
           name: path.basename(executablePath, path.extname(executablePath)),
           exe: path.basename(executablePath),
-          path: executablePath
+          path: executablePath 
         }
       });
       store.addAllowedApp(allowedApp);

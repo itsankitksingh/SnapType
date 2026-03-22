@@ -8,7 +8,7 @@ let activeWinPromise = null;
 async function getActiveWinFn() {
   if (!activeWinPromise) {
     activeWinPromise = import('active-win').then((module) => module.default || module);
-  }
+  } 
 
   return activeWinPromise;
 }
