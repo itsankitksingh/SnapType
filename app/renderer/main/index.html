@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SnapType</title>
+    <link rel="stylesheet" href="./index.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand-block">
+          <div class="brand-mark">S</div>
+          <div>
+            <p class="eyebrow">Windows Text Expander</p>
+            <h1>SnapType</h1>
+          </div>
+        </div>
+
+        <label class="search-wrap">
+          <span>Search snippets</span>
+          <input id="searchInput" type="search" placeholder="Find shortcut or text" />
+        </label>
+
+        <div class="sidebar-section-head">
+          <span>Folders</span>
+          <button id="newFolderButton" class="mini-button" type="button">+ Folder</button>
+        </div>
+
+        <div id="folderList" class="folder-list"></div>
+
+        <div class="sidebar-footer">
+          <button id="newSnippetButton" class="primary-button" type="button">New Snippet</button>
+          <button id="settingsButton" class="link-button" type="button">Settings</button>
+        </div>
+      </aside>
+
+      <main class="content-panel">
+        <div id="viewRoot" class="view-root"></div>
+      </main>
+    </div>
+
+    <div id="countdownOverlay" class="countdown-overlay hidden">
+      <div class="countdown-card">
+        <p class="eyebrow">Pick Active Window</p>
+        <h2 id="countdownValue">3</h2>
+        <p>Switch to your target app now.</p>
+      </div>
+    </div>
+
+    <div id="toast" class="toast hidden" aria-live="polite"></div>
+
+    <script src="./index.js"></script>
+  </body>
+</html>

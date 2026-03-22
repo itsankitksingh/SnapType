@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SnapType Placeholder Popup</title>
+    <link rel="stylesheet" href="./popup.css" />
+  </head>
+  <body>
+    <div class="popup-shell">
+      <div class="popup-head">
+        <div>
+          <p class="eyebrow">Complete Snippet</p>
+          <h1 id="popupTitle">Fill placeholders</h1>
+        </div>
+        <button id="closeButton" class="icon-button" type="button" aria-label="Close">x</button>
+      </div>
+
+      <form id="popupForm" class="popup-form"></form>
+
+      <div class="popup-actions">
+        <button id="cancelButton" class="ghost-button" type="button">Cancel</button>
+        <button class="primary-button" type="submit" form="popupForm">Insert</button>
+      </div>
+    </div>
+
+    <script src="./popup.js"></script>
+  </body>
+</html>

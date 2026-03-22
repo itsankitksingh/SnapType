@@ -1,0 +1,25 @@
+{
+  "name": "snaptype",
+  "productName": "SnapType",
+  "version": "1.0.0",
+  "description": "A lightweight Windows text expander built with Electron and vanilla web tech.",
+  "main": "app/main/index.js",
+  "author": "OpenAI Codex",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron .",
+    "postinstall": "electron-builder install-app-deps",
+    "build": "electron-builder --win nsis --x64"
+  },
+  "dependencies": {
+    "@nut-tree/nut-js": "npm:@nut-tree-fork/nut-js@4.2.6",
+    "active-win": "9.0.0",
+    "electron-store": "11.0.2",
+    "uiohook-napi": "1.5.5"
+  },
+  "devDependencies": {
+    "electron": "41.0.3",
+    "electron-builder": "26.8.1"
+  }
+}

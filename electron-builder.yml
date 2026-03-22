@@ -1,0 +1,49 @@
+appId: com.snaptype.app
+productName: SnapType
+asar: true
+compression: maximum
+npmRebuild: false
+electronLanguages:
+  - en-US
+files:
+  - package.json
+  - app/**/*
+  - assets/**/*
+  - "!**/*.map"
+  - "!**/.DS_Store"
+  - "!node_modules/**/{test,tests,__tests__,example,examples,docs,doc,coverage,.github}/**"
+  - "!node_modules/**/{README,readme,CHANGELOG,History,HISTORY,AUTHORS}*"
+  - "!node_modules/clipboardy/fallbacks/linux{,/**}"
+  - "!node_modules/clipboardy/fallbacks/macos{,/**}"
+  - "!node_modules/@nut-tree-fork/libnut-darwin{,/**}"
+  - "!node_modules/@nut-tree-fork/libnut-linux{,/**}"
+  - "!node_modules/@nut-tree-fork/libnut-win32/build/Release/*.lib"
+  - "!node_modules/@nut-tree-fork/libnut-win32/build/Release/*.exp"
+  - "!node_modules/@nut-tree-fork/libnut-win32/build/Release/*.pdb"
+  - "!node_modules/@nut-tree-fork/libnut-win32/build/Release/*.ilk"
+  - "!node_modules/active-win/build{,/**}"
+  - "!node_modules/active-win/main{,/**}"
+  - "!node_modules/active-win/Sources{,/**}"
+  - "!node_modules/active-win/binding.gyp"
+  - "!node_modules/uiohook-napi/build{,/**}"
+  - "!node_modules/uiohook-napi/libuiohook{,/**}"
+  - "!node_modules/uiohook-napi/src{,/**}"
+  - "!node_modules/uiohook-napi/binding.gyp"
+  - "!node_modules/uiohook-napi/prebuilds/darwin-arm64{,/**}"
+  - "!node_modules/uiohook-napi/prebuilds/linux-arm64{,/**}"
+  - "!node_modules/uiohook-napi/prebuilds/win32-arm64{,/**}"
+directories:
+  output: dist
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  icon: assets/icon.ico
+artifactName: SnapType-Setup-${version}.${ext}
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  perMachine: false
+  deleteAppDataOnUninstall: false
+  differentialPackage: false

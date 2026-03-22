@@ -1,0 +1,122 @@
+:root {
+  color-scheme: dark;
+  --panel: rgba(12, 20, 29, 0.96);
+  --line: rgba(162, 189, 214, 0.18);
+  --text: #ebf4ff;
+  --text-muted: #8ea5bc;
+  --accent: #63c2ff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  font-family: "Segoe UI Variable Text", Aptos, "Trebuchet MS", sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at top left, rgba(99, 194, 255, 0.16), transparent 28%),
+    linear-gradient(160deg, #081118 0%, #0c1620 100%);
+}
+
+body {
+  padding: 14px;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.popup-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-height: calc(100vh - 28px);
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--panel);
+  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.36);
+}
+
+.popup-head,
+.popup-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.69rem;
+  color: var(--text-muted);
+}
+
+.popup-head h1 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.icon-button,
+.ghost-button,
+.primary-button {
+  border: 0;
+  border-radius: 14px;
+  padding: 10px 14px;
+  cursor: pointer;
+}
+
+.icon-button,
+.ghost-button {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+}
+
+.primary-button {
+  background: linear-gradient(150deg, #73d9ff, #2f94da);
+  color: #08131a;
+  font-weight: 700;
+}
+
+.popup-form {
+  display: grid;
+  gap: 14px;
+}
+
+.popup-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.popup-field label {
+  color: var(--text-muted);
+  font-size: 0.86rem;
+}
+
+.popup-field input {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 12px 14px;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.03);
+  outline: none;
+}
+
+.popup-field input:focus {
+  border-color: var(--accent);
+}
+
+.empty-copy {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
